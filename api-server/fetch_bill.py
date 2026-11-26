@@ -4,9 +4,11 @@
 사용법 (PowerShell에서):
     python fetch_bill.py 2218220
     python fetch_bill.py 2218220 2223257      <- 여러 개도 가능
+    python fetch_bill.py                      <- bills.txt 에 적힌 법안 전체 (자동 업데이트가 쓰는 방식)
 
 결과물 (output 폴더):
     bills.csv / bills.xlsx / bills.json  : 팀 공통 데이터
+    changes.json                        : 진행 상황이 바뀐 기록 (알림용)
     raw_<의안번호>.json                 : API가 보내준 원본 응답 (확인용)
 
 인증키: 같은 폴더의 .env 파일에 ASSEMBLY_API_KEY=키 를 적어 두면 자동으로 읽는다.
@@ -14,11 +16,14 @@
 """
 import csv
 import json
+import os
 import sys
 import urllib.parse
 import urllib.request
-from datetime import date
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+KST = timezone(timedelta(hours=9))
 
 BASE = Path(__file__).parent
 OUT = BASE / "output"
@@ -44,6 +49,8 @@ STAGES = ["발의", "위원회 회부", "위원회 상정", "법안소위 심사
 
 
 def load_key():
+    if os.environ.get("ASSEMBLY_API_KEY"):  # GitHub Actions 등에서 환경변수로 넣은 경우
+        return os.environ["ASSEMBLY_API_KEY"].strip()
     env = BASE / ".env"
     if env.exists():
         for line in env.read_text(encoding="utf-8").splitlines():
@@ -184,7 +191,7 @@ def to_record(r, texts, api_status, summary, sub):
         "text_source": text_source,
         "original_url": r["DETAIL_LINK"].replace("http://", "https://"),
         "source_url": SOURCE_URL,
-        "last_checked": date.today().isoformat(),
+        "last_checked": today(),
         "api_status": api_status,
     }
 
@@ -223,8 +230,54 @@ def save(records):
     wb.save(OUT / "bills.xlsx")
 
 
+def today():
+    return datetime.now(KST).date().isoformat()  # 서버(GitHub)가 외국 시간이어도 한국 날짜로 기록
+
+
+def read_bill_list():
+    """bills.txt 에서 의안번호를 읽는다. # 뒤는 메모로 무시."""
+    path = BASE / "bills.txt"
+    if not path.exists():
+        return []
+    nos = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            nos.append(line)
+    return nos
+
+
+def record_changes(old_records, new_records):
+    """이전 결과와 비교해 진행 상황이 바뀐 법안을 changes.json 맨 앞에 추가한다."""
+    old = {r["bill_id"]: r for r in old_records}
+    found = []
+    for r in new_records:
+        before = old.get(r["bill_id"])
+        if before and (before["status"], before["status_date"]) != (r["status"], r["status_date"]):
+            found.append({
+                "detected_date": today(),
+                "bill_id": r["bill_id"],
+                "bill_name": r["bill_name"],
+                "before": f"{before['status']} ({before['status_date']})",
+                "after": f"{r['status']} ({r['status_date']})",
+                "stage_no": r["stage_no"],
+                "original_url": r["original_url"],
+            })
+    path = OUT / "changes.json"
+    history = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    path.write_text(json.dumps(found + history, ensure_ascii=False, indent=2), encoding="utf-8")
+    for c in found:
+        print(f"[변경] {c['bill_id']} {c['bill_name']}: {c['before']} -> {c['after']}")
+    return found
+
+
 def main():
-    bill_nos = sys.argv[1:] or ["2218220"]
+    bill_nos = sys.argv[1:] or read_bill_list()
+    if not bill_nos:
+        print("조회할 의안번호가 없습니다. 예: python fetch_bill.py 2218220  또는 bills.txt 에 번호를 적으세요.")
+        return
+    old_file = OUT / "bills.json"
+    old_records = json.loads(old_file.read_text(encoding="utf-8")) if old_file.exists() else []
     key = load_key()
     mode = "인증키 사용" if key else "샘플 모드(인증키 없음)"
     print(f"호출 방식: {mode}")
@@ -233,18 +286,21 @@ def main():
 
     OUT.mkdir(exist_ok=True)
     records = []
+    previous = {r["bill_id"]: r for r in old_records}
     for no in bill_nos:
         try:
             raw = call_api(no, key, extra={"AGE": AGE})
+            code, msg, rows = parse(raw)
         except Exception as e:
-            print(f"[{no}] 연결 실패: {e}")
-            continue
-        (OUT / f"raw_{no}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
-        code, msg, rows = parse(raw)
+            code, msg, rows, raw = "연결 실패", str(e), [], None
         if code != "INFO-000" or not rows:
             print(f"[{no}] 결과 없음: {code} {msg}")
+            if no in previous:  # 일시적인 오류로 기존 데이터가 사라지지 않게 이전 값 유지
+                print(f"[{no}] 이전 데이터를 그대로 유지합니다 (마지막 확인 {previous[no]['last_checked']})")
+                records.append(previous[no])
             continue
-        api_status = f"API 호출 성공 {date.today().isoformat()} ({mode})"
+        (OUT / f"raw_{no}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
+        api_status = f"API 호출 성공 {today()} ({mode})"
         summary = fetch_summary(no, key)
         sub = fetch_subcommittee(no, key)
         for r in rows:
@@ -254,6 +310,7 @@ def main():
                   f" / 원문: {rec['text_source']}")
 
     if records:
+        record_changes(old_records, records)
         save(records)
         print(f"저장 완료: {OUT}")
 
