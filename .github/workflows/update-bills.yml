@@ -1,0 +1,48 @@
+# 매일 아침 9시(한국 시간)에 api-server/bills.txt 의 법안을 다시 조회해서
+# api-server/output 의 데이터를 최신으로 바꾸고 저장소에 올린다.
+# Actions 탭에서 "Run workflow" 버튼으로 바로 실행할 수도 있다.
+name: Update bills
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # UTC 0시 = 한국 9시
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-bills
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -q openpyxl
+
+      - name: Fetch bills
+        working-directory: api-server
+        env:
+          ASSEMBLY_API_KEY: ${{ secrets.ASSEMBLY_API_KEY }}  # 없으면 샘플 모드로 동작
+        run: python fetch_bill.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api-server/output
+          if git diff --cached --quiet; then
+            echo "변경 없음"
+            exit 0
+          fi
+          git commit -q -m "api-server: 법안 데이터 자동 업데이트 $(TZ=Asia/Seoul date +%F)"
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
