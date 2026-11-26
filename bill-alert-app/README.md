@@ -21,7 +21,7 @@ Noto Sans CJK 글꼴과 ffmpeg가 필요합니다.
 ## 웹앱 배포 (GitHub Pages)
 `main`에 `bill-alert-app/web/`이 바뀌면 `.github/workflows/pages.yml`이 자동으로 배포합니다.
 처음 한 번만 저장소 **Settings → Pages → Source**를 **GitHub Actions**로 바꿔 주세요.
-배포 주소: https://breakthrough-seed.github.io/AI-shortform-alert/
+배포 주소: https://aiwmfrlwh.github.io/AI-shortform-alert/
 
 로컬에서 보기:
 ```bash

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/breakthrough-seed/ai-shortform-alert/bill-alert-app/shorts-template/schema.json",
+  "$id": "https://github.com/aiwmfrlwh/AI-shortform-alert/bill-alert-app/shorts-template/schema.json",
   "title": "법안톡 60초 법안 쇼츠 데이터",
   "description": "render.py가 읽는 쇼츠 문구. '**강조**' 표기는 hook.title_lines(파랑), what.summary_lines·next.lines(주황)에서만 색 강조로 바뀐다. 글자 수 한도는 prompt.md 참고(폭 초과는 render.py가 측정해 오류로 알려 줌).",
   "type": "object",
