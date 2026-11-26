@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>알림 설정</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2346D8;text-decoration:none}a:hover{color:#1A35A8}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F6F5F1; font-family: 'IBM Plex Sans KR', sans-serif; color: #16181D; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 20px 20px 8px; display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px">알림 설정</h1>
+    <p style="margin: 0; font-size: 14px; color: #5B5F68">팔로우한 법안이 어느 단계에 오면 알려드릴까요?</p>
+  </header>
+
+  <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 18px; padding: 8px 20px 0">
+    <section style="background: #FFFFFF; border: 1px solid #E4E2DB; border-radius: 16px; padding: 4px 16px">
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="6">
+        <div style="{{s.rowStyle}}">
+          <div style="display: flex; flex-direction: column; gap: 1px">
+            <span id="{{s.id}}" style="font-size: 15px; font-weight: 500">{{s.label}}</span>
+            <span style="font-size: 12px; color: #5B5F68">{{s.sub}}</span>
+          </div>
+          <button role="switch" aria-checked="{{s.checked}}" aria-labelledby="{{s.id}}" onClick="{{s.toggle}}" style="{{s.track}}">
+            <span style="{{s.knob}}"></span>
+          </button>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 700">받는 방식</h2>
+      <div role="radiogroup" aria-label="받는 방식" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #ECEAE4; border-radius: 12px; padding: 4px">
+        <button role="radio" aria-checked="{{instantChecked}}" onClick="{{pickInstant}}" style="{{instantStyle}}">즉시 알림</button>
+        <button role="radio" aria-checked="{{digestChecked}}" onClick="{{pickDigest}}" style="{{digestStyle}}">하루 한 번 요약</button>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #5B5F68">{{modeHint}}</p>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E4E2DB; border-radius: 16px; padding: 4px 16px">
+      <div style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; border-bottom: 1px solid #EFEDE7">
+        <div style="display: flex; flex-direction: column; gap: 1px">
+          <span id="shorts-alert" style="font-size: 15px; font-weight: 500">관심 분야 새 쇼츠</span>
+          <span style="font-size: 12px; color: #5B5F68">관련 쇼츠가 올라오면 알림</span>
+        </div>
+        <button role="switch" aria-checked="{{shortsChecked}}" aria-labelledby="shorts-alert" onClick="{{toggleShorts}}" style="{{shortsTrack}}">
+          <span style="{{shortsKnob}}"></span>
+        </button>
+      </div>
+      <a href="#" style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; color: #16181D">
+        <span style="font-size: 15px; font-weight: 500">방해 금지 시간</span>
+        <span style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #5B5F68">22:00 – 08:00
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+        </span>
+      </a>
+    </section>
+  </div>
+
+  <nav aria-label="하단 메뉴" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #E4E2DB; padding: 6px 8px 22px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 11px; font-weight: 500; color: #5B5F68">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>홈</a>
+    <a href="Shorts.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 11px; font-weight: 500; color: #5B5F68">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="3"></rect><path d="M10 9l5 3-5 3z"></path></svg>쇼츠</a>
+    <a href="Alerts.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 11px; font-weight: 600; color: {{accent}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>알림</a>
+    <a href="Interests.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 11px; font-weight: 500; color: #5B5F68">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>내 관심</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#2346D8","options":["#2346D8","#0F766E","#6D28D9","#16181D"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: { s0: true, s1: false, s2: true, s3: true, s4: true, s5: true }, mode: 'instant', shorts: true };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#2346D8';
+    const sw = (on) => ({
+      track: 'width: 52px; height: 32px; border-radius: 16px; border: 0; padding: 0; position: relative; cursor: pointer; flex-shrink: 0; background: ' + (on ? accent : '#C9C6BD') + ';',
+      knob: 'position: absolute; top: 3px; left: ' + (on ? '23px' : '3px') + '; width: 26px; height: 26px; border-radius: 13px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.2);'
+    });
+    const defs = [
+      ['접수·발의', '새 법안이 발의되면'],
+      ['소관위원회 회부', '어느 위원회로 갔는지'],
+      ['소관위원회 심사', '심사 시작·통과·보류'],
+      ['법제사법위원회', '체계·자구 심사 결과'],
+      ['본회의 심의', '상정·가결·부결'],
+      ['정부 이송·공포', '공포일과 시행일']
+    ];
+    const on = this.state.on;
+    const stages = defs.map(([label, sub], i) => {
+      const k = 's' + i, v = !!on[k], s = sw(v);
+      return {
+        id: 'stage-' + i, label, sub,
+        checked: v ? 'true' : 'false',
+        track: s.track, knob: s.knob,
+        rowStyle: 'display: flex; align-items: center; justify-content: space-between; min-height: 56px;' + (i < defs.length - 1 ? ' border-bottom: 1px solid #EFEDE7;' : ''),
+        toggle: () => this.setState({ on: { ...on, [k]: !v } })
+      };
+    });
+    const seg = (sel) => "height: 44px; border: 0; border-radius: 9px; cursor: pointer; font: " + (sel ? '600' : '500') + " 14px 'IBM Plex Sans KR', sans-serif; " +
+      (sel ? 'background: #FFFFFF; color: #16181D; box-shadow: 0 1px 2px rgba(0,0,0,0.08);' : 'background: transparent; color: #5B5F68;');
+    const instant = this.state.mode === 'instant';
+    const sh = sw(this.state.shorts);
+    return {
+      accent, stages,
+      instantChecked: instant ? 'true' : 'false',
+      digestChecked: instant ? 'false' : 'true',
+      instantStyle: seg(instant), digestStyle: seg(!instant),
+      modeHint: instant ? '단계가 바뀌는 즉시 푸시 알림을 보내드려요.' : '매일 아침 8시, 하루 동안의 변화를 모아서 보내드려요.',
+      pickInstant: () => this.setState({ mode: 'instant' }),
+      pickDigest: () => this.setState({ mode: 'digest' }),
+      shortsChecked: this.state.shorts ? 'true' : 'false',
+      shortsTrack: sh.track, shortsKnob: sh.knob,
+      toggleShorts: () => this.setState({ shorts: !this.state.shorts })
+    };
+  }
+}
+</script>
+</body>
+</html>

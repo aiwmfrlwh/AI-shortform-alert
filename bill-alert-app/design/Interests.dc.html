@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>관심 분야 선택</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2346D8;text-decoration:none}a:hover{color:#1A35A8}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F6F5F1; font-family: 'IBM Plex Sans KR', sans-serif; color: #16181D; display: flex; flex-direction: column; overflow: hidden; padding: 24px 20px 28px; gap: 24px">
+  <div style="display: flex; align-items: center; gap: 12px">
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+      <div style="height: 4px; border-radius: 2px; background: {{accent}}"></div>
+      <div style="height: 4px; border-radius: 2px; background: {{accent}}"></div>
+      <div style="height: 4px; border-radius: 2px; background: #E4E2DB"></div>
+    </div>
+    <span style="font-size: 13px; color: #5B5F68">2 / 3</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <h1 style="margin: 0; font-size: 26px; line-height: 1.35; font-weight: 700; letter-spacing: -0.5px">어떤 분야의 법안이<br>궁금하세요?</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #5B5F68">고른 분야의 법안 진행 소식과 쇼츠를 먼저 보여드려요. 나중에 언제든 바꿀 수 있어요.</p>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start">
+    <sc-for list="{{cats}}" as="c" hint-placeholder-count="16">
+      <button onClick="{{c.toggle}}" aria-pressed="{{c.pressed}}" style="{{c.style}}">{{c.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <p style="margin: 0; font-size: 14px; color: #5B5F68; text-align: center"><span style="font-weight: 700; color: #16181D">{{count}}개</span> 선택됨 · 3개 이상 추천</p>
+    <a href="Main.dc.html" style="height: 56px; border-radius: 14px; background: {{accent}}; color: #FFFFFF; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">다음</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#2346D8","options":["#2346D8","#0F766E","#6D28D9","#16181D"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { picked: { '주거·부동산': true, '노동·일자리': true, '디지털·AI': true } };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#2346D8';
+    const labels = ['주거·부동산','노동·일자리','교육','복지','환경·기후','교통','디지털·AI','의료·보건','세금·재정','청년','육아·가족','안전·재난','문화·예술','반려동물','국방·외교','농어업'];
+    const picked = this.state.picked;
+    const base = "height: 44px; padding: 0 16px; border-radius: 22px; font: 500 15px 'IBM Plex Sans KR', sans-serif; cursor: pointer; ";
+    const cats = labels.map((label) => {
+      const on = !!picked[label];
+      return {
+        label,
+        pressed: on ? 'true' : 'false',
+        style: base + (on ? 'background: ' + accent + '; color: #FFFFFF; border: 1px solid ' + accent + '; font-weight: 600;' : 'background: #FFFFFF; color: #16181D; border: 1px solid #E4E2DB;'),
+        toggle: () => this.setState({ picked: { ...picked, [label]: !on } })
+      };
+    });
+    return { accent, cats, count: Object.values(picked).filter(Boolean).length };
+  }
+}
+</script>
+</body>
+</html>
