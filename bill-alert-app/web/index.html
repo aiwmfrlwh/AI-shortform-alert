@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F6F5F1">
+<title>법안톡 · 입법 알림</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 차분하고 믿을 수 있는 시민용 앱, 쉬운 말
+   IDEA: 국회 의안 진행표를 손안의 알림판으로
+   PICTURE: 법안마다 6칸 진행 막대와 세로 타임라인, 쇼츠는 검은 화면 영상
+   COLOUR and TYPE: 미색 바탕, 잉크, 파랑 하나, 진행 중은 주황 / IBM Plex Sans KR
+   LAYOUT: 휴대폰 한 칸(최대 430px), 하단 탭, 데스크톱에서는 가운데 정렬 */
+:root{color-scheme:light;--bg:#F6F5F1;--ink:#16181D;--mut:#5B5F68;--line:#E4E2DB;--card:#fff;--acc:#2346D8;--acc-soft:#EAEEFC;--now:#C2410C;--ok:#0F7A4A}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%}
+body{background:#E9E7E1;color:var(--ink);font:16px/1.55 'IBM Plex Sans KR',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--acc);text-decoration:none}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.app{max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media(min-width:600px){.app{box-shadow:0 0 0 1px var(--line),0 20px 60px rgba(0,0,0,.08)}}
+main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.pad{padding:20px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:19px;letter-spacing:-.3px}
+.logo{width:32px;height:32px;border-radius:9px;background:var(--acc);display:grid;place-items:center}
+.icon-btn{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;position:relative}
+.icon-btn.plain{border:0;background:transparent}
+.dot{position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:5px;background:var(--now);border:2px solid #fff}
+h1{margin:0;font-size:24px;line-height:1.35;letter-spacing:-.5px}
+h2{margin:0;font-size:17px}
+.mut{color:var(--mut)}.sm{font-size:13px}
+.pills{display:flex;gap:8px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.pill{flex:none;height:38px;padding:0 15px;border-radius:19px;border:1px solid var(--line);background:var(--card);font-weight:500;font-size:14px}
+.pill[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.cards{display:flex;flex-direction:column;gap:12px}
+.card{display:flex;flex-direction:column;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;color:var(--ink);text-align:left;width:100%}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cat{font-size:12px;font-weight:600;color:var(--acc);background:var(--acc-soft);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.bt{font-size:16px;font-weight:600;line-height:1.4;letter-spacing:-.2px}
+.bar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.bar i{height:6px;border-radius:3px;background:var(--line)}
+.bar i.d{background:var(--acc)}.bar i.n{background:var(--now)}
+.st{font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.st b{color:var(--now)}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:24px;text-align:center;color:var(--mut);font-size:14px}
+.thumbs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+.thumb{flex:none;width:112px;height:168px;border-radius:12px;background:#23252B center/cover;display:flex;align-items:flex-end;padding:10px;color:#fff;font-size:13px;font-weight:600;line-height:1.35;border:0;text-align:left;position:relative;overflow:hidden}
+.thumb::after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.thumb span{position:relative;z-index:1}
+.thumb.soon{background:#2E3138;color:#B8BBC2}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--card);border-top:1px solid var(--line);padding:4px 8px calc(10px + env(safe-area-inset-bottom))}
+.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;font-size:11px;font-weight:500;color:var(--mut);position:relative}
+.tabs a[aria-current=page]{color:var(--acc);font-weight:600}
+.tabs .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:16px;height:16px;border-radius:8px;background:var(--now);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.app.dark{background:#0E0F12}.app.dark .tabs{background:#0E0F12;border-color:#23252B}.app.dark .tabs a{color:#9DA1AA}.app.dark .tabs a[aria-current=page]{color:#fff}
+/* onboarding */
+.steps3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:1}
+.steps3 i{height:4px;border-radius:2px;background:var(--line)}.steps3 i.on{background:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:500}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.cta{height:56px;border-radius:14px;background:var(--acc);color:#fff;border:0;font-size:17px;font-weight:600;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+.cta:disabled{opacity:.4;cursor:not-allowed}
+.cta.ghost{background:#fff;color:var(--acc);border:1.5px solid var(--acc)}
+.sticky{position:sticky;bottom:0;padding:12px 20px 16px;background:var(--bg);border-top:1px solid var(--line)}
+/* detail */
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.box h3{margin:0 0 6px;font-size:13px;color:var(--acc)}
+.box p,.box ul{margin:0;font-size:14px;line-height:1.65;color:#2A2D33}
+.box ul{padding-left:18px}
+.two{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.side h3.pro{color:var(--ok)}.side h3.con{color:#B42318}
+.tl{display:flex;flex-direction:column}
+.ts{display:flex;gap:12px}
+.ts .rail{display:flex;flex-direction:column;align-items:center;width:20px}
+.ts .k{width:14px;height:14px;border-radius:7px;margin-top:4px;background:#fff;border:2px solid #C9C6BD;flex:none}
+.ts.d .k{background:var(--acc);border-color:var(--acc)}
+.ts.n .k{border:4px solid var(--now)}
+.ts .ln{width:2px;flex:1;min-height:20px;background:var(--line)}
+.ts.d .ln{background:var(--acc)}
+.ts .tx{flex:1;padding-bottom:14px;display:flex;justify-content:space-between;gap:8px}
+.ts .tx b{font-size:15px;font-weight:500;display:block}
+.ts.n .tx b{font-weight:700}.ts.t .tx b{color:var(--mut)}
+.tag{font-size:12px;font-weight:700;color:#fff;background:var(--now);padding:2px 8px;border-radius:10px;height:fit-content;white-space:nowrap}
+.watch{display:flex;align-items:center;gap:12px;background:var(--ink);border-radius:14px;padding:12px 14px;color:#fff;border:0;width:100%;text-align:left}
+.src{font-size:12px;color:var(--mut);line-height:1.6}
+.src a{color:var(--mut);text-decoration:underline}
+/* shorts */
+.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;background:#0E0F12;scrollbar-width:none}
+.reel{height:100%;scroll-snap-align:start;position:relative;display:flex;align-items:center;justify-content:center;background:#1C1E23;overflow:hidden;color:#fff}
+.reel video{width:100%;height:100%;object-fit:contain;background:#0E0F12}
+.reel .tap{position:absolute;inset:0;border:0;background:transparent}
+.reel .mute{position:absolute;top:14px;right:14px;height:36px;padding:0 12px;border-radius:18px;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:13px;font-weight:600}
+.side-acts{position:absolute;right:8px;bottom:120px;display:flex;flex-direction:column;gap:10px}
+.side-acts button{width:56px;border:0;background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:500;padding:4px 0;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.reel .meta{position:absolute;left:14px;right:76px;bottom:14px}
+.linkcard{display:flex;align-items:center;gap:10px;background:#fff;color:var(--ink);border-radius:12px;padding:10px 12px;border:0;width:100%;text-align:left}
+.linkcard small{display:block;font-size:11px;font-weight:600;color:var(--acc)}
+.linkcard strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.soonbox{text-align:center;padding:0 40px;color:#B8BBC2}
+.soonbox strong{display:block;color:#fff;font-size:20px;margin:10px 0 6px}
+/* alerts */
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;background:#ECEAE4;border-radius:12px;padding:4px}
+.seg button{height:42px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:14px;font-weight:500}
+.seg button[aria-checked=true],.seg button[aria-selected=true]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.set{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:2px 16px}
+.set .r{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;border-bottom:1px solid #EFEDE7}
+.set .r:last-child{border-bottom:0}
+.sw{width:52px;height:32px;border-radius:16px;border:0;padding:0;position:relative;background:#C9C6BD;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:13px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .2s}
+.sw[aria-checked=true]{background:var(--acc)}.sw[aria-checked=true]::after{left:23px}
+.noti{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #EFEDE7;width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:left}
+.noti .ic{width:40px;height:40px;border-radius:12px;background:var(--acc-soft);display:grid;place-items:center;flex:none}
+.noti.unread .ic{background:#FDEBDD}
+.noti p{margin:0;font-size:14px;line-height:1.5}
+#toast{position:absolute;left:16px;right:16px;top:12px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;transform:translateY(-140%);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:9}
+#toast.on{transform:none}
+@media(prefers-reduced-motion:reduce){#toast,.sw,.sw::after{transition:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div id="toast" role="status" aria-live="polite"></div>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs" aria-label="하단 메뉴"></nav>
+</div>
+<script>
+{
+const VIDEO_TSG = 'media/gb-tsg.mp4', POSTER_TSG = 'media/gb-tsg.jpg';
+const STAGES = ['접수·발의','소관위원회 회부','소관위원회 심사','법제사법위원회','본회의 심의','정부 이송·공포'];
+const CATS = ['주거·부동산','노동·일자리','교육','복지','환경·기후','교통','디지털·AI','의료·보건','세금·재정','청년','육아·가족','안전·재난','문화·예술','반려동물','국방·외교','농어업'];
+const BILLS = [
+  {id:'tsg', cats:['의료·보건','복지'], cat:'의료·보건', short:'건보공단 특사경법',
+   title:'사법경찰직무법 개정안 (건보공단 특사경)', cur:3, hold:true, status:'법사위 전체회의 의결 보류', when:'11.18',
+   subs:['2018.12 첫 발의 · 20·21대 폐기 → 22대 재발의','법제사법위원회','11.11 법안심사1소위 통과 (8건 병합)','11.16 의결 보류 · 11.18 처리 불발','',''],
+   summary:['건보공단 지정 직원에게 사무장병원·면허대여약국 등 불법 개설 의료기관을 수사할 특별사법경찰 권한을 줘요.','공단 특사경에는 수사종결권이 없어요.','같은 법률의 다른 기관 특사경 개정안과 함께 다시 심사할 예정이에요.'],
+   pro:['2009~2025년 적발 사무장병원 1,805곳, 재정 피해 약 2조 9천억 원 (노조 주장)','수사 기간 평균 11개월 → 3개월 단축 기대 (공단 추산)'],
+   con:['진료비 지급·환수 기관이 강제수사권까지 가지면 이해충돌 (의협·병협)','법무부도 적법절차 통제장치 필요 의견'],
+   video:true,
+   sources:[['코메디닷컴','https://kormedi.com/2906341/'],['팍스메디컬뉴스','https://www.paxmedicalnews.com/news/articleView.html?idxno=3415'],['데일리팜','https://dailypharm.com/user/news/345090'],['서울경제','https://m.sedaily.com/article/20116079']]},
+  {id:'eldercare', cats:['주거·부동산','복지'], cat:'주거·복지', short:'고령자돌봄주택 특별법',
+   title:'고령자돌봄주택 특별법안', cur:2, hold:false, status:'소관 상임위 심사 중', when:'11.26',
+   subs:['','소관 상임위원회','상임위 문턱을 넘지 못하고 계류','','',''],
+   summary:['의료·요양 서비스를 결합한 고령자 특화 주택의 공급을 지원하는 법안이에요.','정쟁 여파로 상임위 논의가 멈춰 있다는 보도가 나왔어요.'],
+   pro:[],con:[], video:false,
+   sources:[['서울경제','https://www.sedaily.com/article/20118964']]},
+  {id:'pm', cats:['교통','안전·재난'], cat:'교통·안전', short:'개인형 이동수단 안전관리법',
+   title:'개인형 이동수단 안전관리법안', cur:2, hold:false, status:'소관 상임위 심사 중', when:'11.26',
+   subs:['','소관 상임위원회','상임위 문턱을 넘지 못하고 계류','','',''],
+   summary:['공유 전동킥보드 같은 개인형 이동수단의 안전관리를 강화하는 법안이에요.','상임위 단계에서 논의가 이어지지 못하고 있어요.'],
+   pro:[],con:[], video:false,
+   sources:[['서울경제','https://www.sedaily.com/article/20118964']]}
+];
+const NOTIS = [
+  {id:'n4', bill:'tsg', date:'11.18', text:'건보공단 특사경법 — 법사위 전체회의에서 또 처리되지 않았어요.'},
+  {id:'n3', bill:'tsg', date:'11.16', text:'건보공단 특사경법 — 법사위 전체회의 의결이 보류됐어요. 1분 쇼츠로 정리했어요.'},
+  {id:'n5', bill:'eldercare', date:'11.26', text:'고령자돌봄주택 특별법 — 상임위 심사가 멈춰 있어요.'},
+  {id:'n2', bill:'tsg', date:'11.11', text:'건보공단 특사경법 — 법사위 법안심사소위를 통과했어요.'}
+];
+const ICON = {
+  home:'<path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  shorts:'<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M10 9l5 3-5 3z"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  back:'<path d="M15 18l-6-6 6-6"/>', chev:'<path d="M9 18l6-6-6-6"/>', check:'<path d="M5 12l5 5L20 7"/>',
+  heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',
+  save:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  share:'<path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/>',
+  bldg:'<path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6"/>'
+};
+const ic = (n, s=22, extra='') => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${ICON[n]}</svg>`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---- state (remembered in this browser only) ---- */
+const KEY = 'beopantalk-v1';
+const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox'};
+let S = {...DEF};
+try { S = {...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}')}; } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const bill = id => BILLS.find(b => b.id === id);
+const following = id => S.follow.includes(id);
+const unread = () => NOTIS.filter(n => !S.read.includes(n.id) && following(n.bill)).length;
+
+/* ---- toast ---- */
+let tt;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = ic('bell',20) + '<span>' + esc(msg) + '</span>';
+  t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 3200);
+}
+
+/* ---- pieces ---- */
+const bar = b => '<div class="bar" aria-label="진행 ' + (b.cur+1) + '/6단계">' + STAGES.map((_, i) => `<i class="${i < b.cur ? 'd' : i === b.cur ? 'n' : ''}"></i>`).join('') + '</div>';
+const billCard = b => `<button class="card" data-go="bill-${b.id}">
+  <div class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm">${following(b.id) ? '팔로우 중 · ' : ''}${esc(b.when)}</span></div>
+  <div class="bt">${esc(b.title)}</div>${bar(b)}
+  <div class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span></div></button>`;
+
+function viewHome(){
+  let list = BILLS;
+  if (S.filter === 'follow') list = BILLS.filter(b => following(b.id));
+  if (S.filter === 'interest') list = BILLS.filter(b => b.cats.some(c => S.interests.includes(c)));
+  const f = (k, l) => `<button class="pill" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`;
+  return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18,'stroke="#fff" stroke-width="2"')}</span>법안톡</div>
+    <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
+  <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
+    <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식 · 2026.11.26 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
+    <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}</div>
+    <div class="cards">${list.length ? list.map(billCard).join('') : '<div class="empty">아직 해당하는 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>'}</div>
+    <section style="display:flex;flex-direction:column;gap:8px">
+      <div class="row"><h2>관심 분야 쇼츠</h2><a href="#shorts" style="min-height:44px;display:flex;align-items:center;font-size:14px">전체 보기</a></div>
+      <div class="thumbs">${BILLS.map(b => b.video
+        ? `<button class="thumb" data-go="shorts" style="background-image:url(${POSTER_TSG})"><span>${esc(b.short)}, 1분 정리</span></button>`
+        : `<button class="thumb soon" data-go="shorts"><span>${esc(b.short)}<br>쇼츠 준비 중</span></button>`).join('')}</div>
+    </section>
+    <p class="mut sm" style="margin:0">법안 정보는 2026년 11월 보도를 바탕으로 정리한 시연용 데이터예요.</p>
+  </div>`;
+}
+
+function viewBill(id){
+  const b = bill(id); if (!b) return viewHome();
+  const tl = STAGES.map((s, i) => {
+    const cls = i < b.cur ? 'd' : i === b.cur ? 'n' : 't';
+    return `<div class="ts ${cls}"><div class="rail"><span class="k"></span>${i < 5 ? '<span class="ln"></span>' : ''}</div>
+      <div class="tx"><div><b>${s}</b>${b.subs[i] ? `<span class="mut sm">${esc(b.subs[i])}</span>` : ''}</div>${i === b.cur ? `<span class="tag">${b.hold ? '보류' : '진행 중'}</span>` : ''}</div></div>`;
+  }).join('');
+  const f = following(b.id);
+  return `<div class="top" style="padding:8px 8px 0"><a class="icon-btn plain" href="#home" aria-label="뒤로" style="color:var(--ink)">${ic('back')}</a>
+    <button class="icon-btn plain" data-act="share" aria-label="공유">${ic('share',20)}</button></div>
+  <div class="pad" style="padding-top:0;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="cat" style="align-self:flex-start">${esc(b.cat)}</span>
+      <h1 style="font-size:22px">${esc(b.title)}</h1><p class="mut sm" style="margin:0">현재: <b style="color:var(--now)">${esc(b.status)}</b> · ${esc(b.when)} 업데이트</p></div>
+    <div class="box"><h3>쉬운 요약</h3><ul>${b.summary.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
+    ${b.pro.length ? `<div class="two"><div class="box side"><h3 class="pro">찬성 측</h3><ul>${b.pro.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
+      <div class="box side"><h3 class="con">반대 측</h3><ul>${b.con.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div></div>` : ''}
+    <section><h2 style="margin-bottom:10px">진행 단계</h2><div class="tl">${tl}</div></section>
+    ${b.video ? `<button class="watch" data-go="shorts"><span style="width:36px;height:36px;border-radius:10px;background:#2E3138;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+      <span style="flex:1"><b style="display:block;font-size:14px">이 법안 1분 쇼츠로 보기</b><span style="font-size:12px;color:#B8BBC2">44초 · 자막</span></span>${ic('chev',18)}</button>` : ''}
+    <p class="src">출처: ${b.sources.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>
+  </div>
+  <div class="sticky"><button class="cta ${f ? 'ghost' : ''}" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${ic('bell',18)}${f ? '알림 받는 중' : '이 법안 진행 알림 받기'}</button></div>`;
+}
+
+function viewShorts(){
+  const filt = S.interests.length ? BILLS.filter(b => b.cats.some(c => S.interests.includes(c))) : BILLS;
+  const list = [...filt, ...BILLS.filter(b => !filt.includes(b))];
+  return '<div class="feed" id="feed">' + list.map(b => {
+    const liked = S.liked.includes(b.id), saved = S.saved.includes(b.id);
+    const media = b.video
+      ? `<video src="${VIDEO_TSG}" poster="${POSTER_TSG}" playsinline muted loop preload="metadata" aria-label="${esc(b.short)} 쇼츠"></video>
+         <button class="tap" data-act="playpause" aria-label="재생 또는 일시정지"></button>
+         <button class="mute" data-act="mute">소리 켜기</button>`
+      : `<div class="soonbox">${ic('shorts',44)}<strong>${esc(b.short)}</strong><span>쇼츠를 만들고 있어요. 다음 단계로 넘어가면 자동으로 올라와요.</span></div>`;
+    return `<section class="reel" aria-label="${esc(b.short)}">${media}
+      <div class="side-acts">
+        <button data-act="like" data-id="${b.id}" aria-pressed="${liked}"><svg width="28" height="28" viewBox="0 0 24 24" fill="${liked ? '#F0536B' : 'none'}" stroke="${liked ? '#F0536B' : '#fff'}" stroke-width="1.8" aria-hidden="true">${ICON.heart}</svg>공감</button>
+        <button data-act="save" data-id="${b.id}" aria-pressed="${saved}"><svg width="28" height="28" viewBox="0 0 24 24" fill="${saved ? '#fff' : 'none'}" stroke="#fff" stroke-width="1.8" aria-hidden="true">${ICON.save}</svg>${saved ? '저장됨' : '저장'}</button>
+        <button data-act="share" aria-label="공유">${ic('share',28)}공유</button>
+      </div>
+      ${b.video ? '' : ''}
+      <div class="meta"><button class="linkcard" data-go="bill-${b.id}"><span style="flex:1;min-width:0"><small>${esc(b.cat)} · ${esc(b.status)}</small><strong>${esc(b.title)}</strong></span><b style="font-size:13px;color:var(--acc);white-space:nowrap">법안 보기</b></button></div>
+    </section>`;
+  }).join('') + '</div>';
+}
+
+function viewAlerts(){
+  const tab = (k, l) => `<button role="tab" aria-selected="${S.alertTab === k}" data-alerttab="${k}">${l}</button>`;
+  let body;
+  if (S.alertTab === 'inbox') {
+    const list = NOTIS.filter(n => following(n.bill)).sort((a, b) => b.date.localeCompare(a.date));
+    body = list.length ? '<div>' + list.map(n => `<button class="noti ${S.read.includes(n.id) ? '' : 'unread'}" data-noti="${n.id}">
+        <span class="ic" style="color:${S.read.includes(n.id) ? 'var(--acc)' : 'var(--now)'}">${ic('bell',20)}</span>
+        <span style="flex:1"><p>${esc(n.text)}</p><span class="mut sm">${n.date}</span></span></button>`).join('') + '</div>'
+      : '<div class="empty">팔로우한 법안의 알림이 여기에 쌓여요.</div>';
+    body += `<button class="cta ghost" data-act="test" style="margin-top:16px">${ic('bell',18)}테스트 알림 보내기</button>`;
+  } else {
+    body = `<p class="mut sm" style="margin:0 0 8px">팔로우한 법안이 어느 단계에 오면 알려드릴까요?</p>
+    <div class="set">${STAGES.map((s, i) => `<div class="r"><span id="st${i}" style="font-size:15px;font-weight:500">${s}</span>
+      <button class="sw" role="switch" aria-checked="${S.stages[i]}" aria-labelledby="st${i}" data-stage="${i}"></button></div>`).join('')}</div>
+    <h2 style="font-size:15px;margin:18px 0 8px">받는 방식</h2>
+    <div class="seg" role="radiogroup" aria-label="받는 방식"><button role="radio" aria-checked="${S.mode === 'instant'}" data-mode="instant">즉시 알림</button><button role="radio" aria-checked="${S.mode === 'digest'}" data-mode="digest">하루 한 번 요약</button></div>
+    <p class="mut sm" style="margin:8px 0 18px">${S.mode === 'instant' ? '단계가 바뀌는 즉시 알려드려요.' : '매일 아침 8시, 하루 동안의 변화를 모아서 보내드려요.'}</p>
+    <div class="set"><div class="r"><span id="sa" style="font-size:15px;font-weight:500">관심 분야 새 쇼츠</span><button class="sw" role="switch" aria-checked="${S.shortsAlert}" aria-labelledby="sa" data-act="shortsAlert"></button></div></div>`;
+  }
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>알림</h1>
+    <div class="seg" role="tablist">${tab('inbox','알림함' + (unread() ? ' ' + unread() : ''))}${tab('settings','설정')}</div>${body}</div>`;
+}
+
+function viewInterests(){
+  const n = S.interests.length;
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:22px;min-height:100%">
+    <div class="row"><div class="steps3"><i class="on"></i><i class="on"></i><i></i></div><span class="mut sm">2 / 3</span></div>
+    <div><h1 style="font-size:26px">어떤 분야의 법안이<br>궁금하세요?</h1><p class="mut" style="margin:8px 0 0;font-size:15px">고른 분야의 법안 소식과 쇼츠를 먼저 보여드려요. 언제든 바꿀 수 있어요.</p></div>
+    <div class="chips" style="flex:1;align-content:flex-start">${CATS.map(c => `<button class="chip" data-cat="${c}" aria-pressed="${S.interests.includes(c)}">${c}</button>`).join('')}</div>
+    <div><p class="mut sm" style="text-align:center;margin:0 0 10px"><b style="color:var(--ink)">${n}개</b> 선택됨 · 3개 이상 추천</p>
+    <button class="cta" data-act="done" ${n ? '' : 'disabled'}>${S.onboarded ? '저장' : '다음'}</button></div></div>`;
+}
+
+/* ---- router ---- */
+const app = document.getElementById('app'), view = document.getElementById('view'), tabs = document.getElementById('tabs');
+function route(){
+  let h = location.hash.slice(1) || (S.onboarded ? 'home' : 'interests');
+  let html, tab = h;
+  if (h.startsWith('bill-')) { html = viewBill(h.slice(5)); tab = 'home'; }
+  else if (h === 'shorts') html = viewShorts();
+  else if (h === 'alerts') html = viewAlerts();
+  else if (h === 'interests') html = viewInterests();
+  else { html = viewHome(); tab = 'home'; }
+  view.innerHTML = html;
+  app.classList.toggle('dark', h === 'shorts');
+  const t = (k, l, i) => `<a href="#${k}" ${tab === k ? 'aria-current="page"' : ''}>${ic(i)}${l}${k === 'alerts' && unread() ? `<span class="badge">${unread()}</span>` : ''}</a>`;
+  tabs.innerHTML = t('home','홈','home') + t('shorts','쇼츠','shorts') + t('alerts','알림','bell') + t('interests','내 관심','user');
+  if (h === 'shorts') setupFeed();
+}
+let keepScroll = false;
+function rerender(){ const y = view.scrollTop; route(); if (keepScroll) view.scrollTop = y; }
+
+/* ---- shorts autoplay ---- */
+let io;
+function setupFeed(){
+  if (io) io.disconnect();
+  io = new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target.querySelector('video'); if (!v) return;
+    if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+  }), {threshold: .6});
+  document.querySelectorAll('.reel').forEach(r => io.observe(r));
+}
+
+/* ---- events ---- */
+view.addEventListener('click', e => {
+  const el = e.target.closest('button,[data-go]'); if (!el) return;
+  const d = el.dataset;
+  keepScroll = true;
+  if (d.go) { keepScroll = false; location.hash = d.go; return; }
+  if (d.filter) { S.filter = d.filter; }
+  else if (d.cat) { S.interests = S.interests.includes(d.cat) ? S.interests.filter(c => c !== d.cat) : [...S.interests, d.cat]; }
+  else if (d.stage) { S.stages[+d.stage] = !S.stages[+d.stage]; }
+  else if (d.mode) { S.mode = d.mode; }
+  else if (d.alerttab) { S.alertTab = d.alerttab; }
+  else if (d.noti) { const n = NOTIS.find(x => x.id === d.noti); if (!S.read.includes(n.id)) S.read.push(n.id); save(); keepScroll = false; location.hash = 'bill-' + n.bill; return; }
+  else if (d.act === 'done') { S.onboarded = true; save(); keepScroll = false; toast('관심 분야 ' + S.interests.length + '개를 저장했어요'); location.hash = 'home'; return; }
+  else if (d.act === 'follow') { const on = following(d.id); S.follow = on ? S.follow.filter(x => x !== d.id) : [...S.follow, d.id]; toast(on ? '알림을 껐어요' : '단계가 바뀌면 바로 알려드릴게요'); }
+  else if (d.act === 'shortsAlert') { S.shortsAlert = !S.shortsAlert; }
+  else if (d.act === 'like' || d.act === 'save') {
+    const k = d.act === 'like' ? 'liked' : 'saved', on = S[k].includes(d.id);
+    S[k] = on ? S[k].filter(x => x !== d.id) : [...S[k], d.id]; save();
+    const v = el.closest('.reel').querySelector('video'), t = v ? v.currentTime : 0;
+    // update just this button without reloading the video
+    if (k === 'liked') { const svg = el.querySelector('svg'); svg.setAttribute('fill', on ? 'none' : '#F0536B'); svg.setAttribute('stroke', on ? '#fff' : '#F0536B'); }
+    else { el.querySelector('svg').setAttribute('fill', on ? 'none' : '#fff'); el.lastChild.textContent = on ? '저장' : '저장됨'; toast(on ? '저장을 취소했어요' : '저장한 쇼츠에 담았어요'); }
+    el.setAttribute('aria-pressed', !on); return;
+  }
+  else if (d.act === 'playpause') { const v = el.parentNode.querySelector('video'); v.paused ? v.play().catch(() => {}) : v.pause(); return; }
+  else if (d.act === 'mute') { const v = el.parentNode.querySelector('video'); v.muted = !v.muted; if (!v.muted) v.play().catch(() => {}); el.textContent = v.muted ? '소리 켜기' : '소리 끄기'; return; }
+  else if (d.act === 'share') {
+    const url = location.href;
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('링크를 복사했어요'), () => toast('공유: ' + url));
+    else toast('공유: ' + url);
+    return;
+  }
+  else if (d.act === 'test') {
+    const msg = '건보공단 특사경법 — 법사위 전체회의 재논의 일정이 잡히면 이렇게 알려드려요';
+    toast(msg);
+    try { if ('Notification' in window) Notification.requestPermission().then(p => { if (p === 'granted') new Notification('법안톡', {body: msg}); }).catch(() => {}); } catch(err) {}
+    return;
+  }
+  else return;
+  save(); rerender();
+});
+window.addEventListener('hashchange', () => { keepScroll = false; route(); view.scrollTop = 0; });
+route();
+}
+</script>
+</body>
+</html>
