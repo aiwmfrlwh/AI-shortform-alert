@@ -24,18 +24,21 @@ BASE = Path(__file__).parent
 OUT = BASE / "output"
 API_URL = "https://open.assembly.go.kr/portal/openapi/nzmimeepazxkubdpn"  # 국회의원 발의법률안
 SUMMARY_URL = "https://open.assembly.go.kr/portal/openapi/BPMBILLSUMMARY"  # 법률안 제안이유 및 주요내용
+SUBCMT_URL = "https://open.assembly.go.kr/portal/openapi/TVBPMCONFINFO"  # 소위 심사정보(법률안)
 AGE = "22"  # 제22대 국회
 SOURCE_URL = "https://open.assembly.go.kr/portal/openapi/main.do"
 
 COLUMNS = [
     "bill_id", "bill_name", "proposer", "propose_date", "committee",
     "status", "status_date", "stage_no",
-    "committee_referred_date", "committee_present_date", "subcommittee_referred_date",
+    "committee_referred_date", "committee_present_date",
+    "subcommittee_name", "subcommittee_referred_date", "subcommittee_present_date",
+    "subcommittee_proc_date", "subcommittee_result",
     "proposal_reason", "main_content", "note", "text_source",
     "original_url", "source_url", "last_checked", "api_status",
 ]
 
-# 화면 표시용 진행 단계 (팀원 A용). stage_no 는 이 목록의 순서(1부터).
+# 화면 표시용 진행 단계 (팀원 A용). stage_no 는 이 목록의 순서(1부터), 0은 진행 종료(폐기, 철회, 부결).
 STAGES = ["발의", "위원회 회부", "위원회 상정", "법안소위 심사", "위원회 의결",
           "법사위 심사", "본회의 의결", "정부 이송", "공포"]
 
@@ -86,6 +89,27 @@ def fetch_summary(bill_no, key):
     return {"proposal_reason": reason, "main_content": content, "note": get("참고사항")}
 
 
+def fetch_subcommittee(bill_no, key):
+    """법안소위 회부일/상정일/처리일을 공식 API에서 가져온다. 소위에 안 갔거나 실패하면 None."""
+    try:
+        code, _, rows = parse(call_api(bill_no, key, SUBCMT_URL, {"AGE": AGE}), "TVBPMCONFINFO")
+    except Exception:
+        return None
+    if code != "INFO-000" or not rows:
+        return None
+    # 한 법안에 여러 줄이 올 수 있다(재회부, 안건조정위원회 등).
+    # 회부일은 있는 값 중 가장 늦은 것, 나머지는 가장 최근에 움직인 줄에서 가져온다.
+    dates = lambda x: max(x.get("SUBMIT_DT") or "", x.get("PRESENT_DT") or "", x.get("PROC_DT") or "")
+    r = max(rows, key=lambda x: (dates(x), bool(x.get("PROC_DT")), "소위" in (x.get("SUB_COMMITTEE_NAME") or "")))
+    return {
+        "subcommittee_name": r.get("SUB_COMMITTEE_NAME") or "",
+        "subcommittee_referred_date": max((x.get("SUBMIT_DT") or "" for x in rows), default=""),
+        "subcommittee_present_date": r.get("PRESENT_DT") or "",
+        "subcommittee_proc_date": r.get("PROC_DT") or "",
+        "subcommittee_result": r.get("PROC_RESULT_CD") or "",
+    }
+
+
 def parse(raw, name="nzmimeepazxkubdpn"):
     """응답에서 결과코드와 법안 목록을 꺼낸다."""
     if "RESULT" in raw:  # 데이터 없음, 키 오류 등
@@ -96,8 +120,12 @@ def parse(raw, name="nzmimeepazxkubdpn"):
     return result["CODE"], result["MESSAGE"], rows
 
 
-def derive_status(r, sub_date):
-    """API 날짜 항목을 보고 가장 마지막에 진행된 단계를 고른다."""
+def derive_status(r, sub):
+    """API 날짜 항목을 보고 가장 마지막에 진행된 단계를 고른다.
+    폐기, 철회, 부결처럼 더 진행되지 않는 법안은 stage_no 0(진행 종료)으로 둔다."""
+    result = r.get("PROC_RESULT") or ""
+    if r.get("PROC_DT") and any(w in result for w in ("폐기", "철회", "부결")):
+        return f"진행 종료: {result}", r["PROC_DT"], 0
     checks = [
         ("PROC_DT", f"본회의 {r.get('PROC_RESULT') or '의결'}", 7),
         ("LAW_PROC_DT", "법사위 심사 완료", 6),
@@ -108,8 +136,12 @@ def derive_status(r, sub_date):
     for field, label, stage in checks:
         if r.get(field):
             return label, r[field], stage
-    if sub_date:  # API에는 없음. 의안정보시스템에서 확인한 값(data/bill_texts.json)
-        return "법안소위 심사 중", sub_date, 4
+    if sub.get("subcommittee_proc_date"):
+        return f"법안소위 {sub.get('subcommittee_result') or '처리'}", sub["subcommittee_proc_date"], 4
+    if sub.get("subcommittee_present_date"):
+        return "법안소위 상정", sub["subcommittee_present_date"], 4
+    if sub.get("subcommittee_referred_date"):
+        return "법안소위 심사 중", sub["subcommittee_referred_date"], 4
     if r.get("CMT_PRESENT_DT"):
         return "위원회 상정", r["CMT_PRESENT_DT"], 3
     if r.get("COMMITTEE_DT"):
@@ -117,10 +149,14 @@ def derive_status(r, sub_date):
     return "발의(접수)", r.get("PROPOSE_DT"), 1
 
 
-def to_record(r, texts, api_status, summary):
+def to_record(r, texts, api_status, summary, sub):
     t = texts.get(r["BILL_NO"], {})
-    sub_date = t.get("subcommittee_referred_date", "")
-    status, status_date, stage = derive_status(r, sub_date)
+    if not sub:  # API에 없으면 data/bill_texts.json 수동 입력값 사용
+        sub = {"subcommittee_referred_date": t.get("subcommittee_referred_date", "")}
+    sub = {k: sub.get(k, "") for k in ("subcommittee_name", "subcommittee_referred_date",
+                                       "subcommittee_present_date", "subcommittee_proc_date",
+                                       "subcommittee_result")}
+    status, status_date, stage = derive_status(r, sub)
     if summary:  # 1순위: 공식 API 자동 수집
         reason, content, note = summary["proposal_reason"], summary["main_content"], summary["note"]
         text_source = "API 자동(BPMBILLSUMMARY)"
@@ -141,7 +177,7 @@ def to_record(r, texts, api_status, summary):
         "stage_no": stage,
         "committee_referred_date": r.get("COMMITTEE_DT") or "",
         "committee_present_date": r.get("CMT_PRESENT_DT") or "",
-        "subcommittee_referred_date": sub_date,
+        **sub,
         "proposal_reason": reason,
         "main_content": content,
         "note": note,
@@ -176,7 +212,8 @@ def save(records):
     for cell in ws[1]:
         cell.font = Font(bold=True)
     wide = {"bill_name": 32, "proposal_reason": 60, "main_content": 60, "note": 40,
-            "original_url": 40, "source_url": 30, "api_status": 24, "text_source": 20}
+            "original_url": 40, "source_url": 30, "api_status": 24, "text_source": 20,
+            "subcommittee_name": 24}
     for i, name in enumerate(COLUMNS, start=1):
         ws.column_dimensions[get_column_letter(i)].width = wide.get(name, 12)
     for row in ws.iter_rows(min_row=2):
@@ -209,8 +246,9 @@ def main():
             continue
         api_status = f"API 호출 성공 {date.today().isoformat()} ({mode})"
         summary = fetch_summary(no, key)
+        sub = fetch_subcommittee(no, key)
         for r in rows:
-            rec = to_record(r, texts, api_status, summary)
+            rec = to_record(r, texts, api_status, summary, sub)
             records.append(rec)
             print(f"[{no}] {rec['bill_name']} / {rec['proposer']} / {rec['status']} ({rec['status_date']})"
                   f" / 원문: {rec['text_source']}")
