@@ -9,6 +9,10 @@
 결과물 (output 폴더):
     bills.csv / bills.xlsx / bills.json  : 팀 공통 데이터
     changes.json                        : 진행 상황이 바뀐 기록 (알림용)
+    new_bills.json                      : 새로 발의된 법안 목록 (bills.txt 로 실행할 때만)
+
+인증키 횟수 절약: 끝난 법안은 조회하지 않고, 제안이유는 한 번만 받고, 소위 정보는 위원회 심사 중일 때만 받는다.
+바뀐 게 없으면 파일을 고치지 않는다.
     raw_<의안번호>.json                 : API가 보내준 원본 응답 (확인용)
 
 인증키: 같은 폴더의 .env 파일에 ASSEMBLY_API_KEY=키 를 적어 두면 자동으로 읽는다.
@@ -59,8 +63,14 @@ def load_key():
     return ""
 
 
+CALLS = {"n": 0}  # 이번 실행에서 API를 몇 번 불렀는지 (인증키 사용량 확인용)
+
+
 def call_api(bill_no, key, url=API_URL, extra=None):
-    params = {"Type": "json", "pIndex": 1, "pSize": 10, "BILL_NO": bill_no, **(extra or {})}
+    CALLS["n"] += 1
+    params = {"Type": "json", "pIndex": 1, "pSize": 10, **(extra or {})}
+    if bill_no:
+        params["BILL_NO"] = bill_no
     if key:
         params["KEY"] = key
     else:
@@ -271,6 +281,85 @@ def record_changes(old_records, new_records):
     return found
 
 
+SUB_FIELDS = ("subcommittee_name", "subcommittee_referred_date", "subcommittee_present_date",
+              "subcommittee_proc_date", "subcommittee_result")
+IGNORE_IN_COMPARE = ("last_checked", "api_status")  # 이 두 칸만 바뀐 건 '변경'으로 보지 않음
+
+
+def detect_new_bills(key):
+    """최근 발의 법안 목록을 API 1번으로 받아, 처음 보는 법안을 new_bills.json 맨 앞에 추가한다."""
+    try:
+        code, msg, rows = parse(call_api("", key, extra={"AGE": AGE, "pSize": 100}))
+    except Exception as e:
+        print(f"[새 법안 확인] 연결 실패: {e}")
+        return False
+    if code != "INFO-000":
+        print(f"[새 법안 확인] 결과 없음: {code} {msg}")
+        return False
+    path = OUT / "new_bills.json"
+    first_run = not path.exists()
+    known = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    seen = {b["bill_id"] for b in known}
+    fresh = [{
+        "detected_date": today(),
+        "bill_id": r["BILL_NO"],
+        "bill_name": r["BILL_NAME"],
+        "proposer": r["PROPOSER"],
+        "propose_date": r["PROPOSE_DT"],
+        "original_url": r["DETAIL_LINK"].replace("http://", "https://"),
+    } for r in rows if r["BILL_NO"] not in seen]
+    if not fresh:
+        print("[새 법안 확인] 새로 발의된 법안 없음")
+        return False
+    path.write_text(json.dumps((fresh + known)[:500], ensure_ascii=False, indent=2), encoding="utf-8")
+    if first_run:
+        print(f"[새 법안 확인] 처음 실행이라 최근 법안 {len(fresh)}건으로 기준 목록을 만들었습니다")
+    else:
+        for b in fresh:
+            print(f"[새 법안] {b['bill_id']} {b['bill_name']} ({b['proposer']}, {b['propose_date']})")
+    return True
+
+
+def update_bill(no, prev, key, texts, mode):
+    """법안 하나를 갱신한다. 꼭 필요한 API만 부른다. 실패하면 이전 값을 돌려준다."""
+    if prev and prev["stage_no"] in (0, 9):  # 폐기/철회/부결 또는 공포: 더 바뀌지 않음
+        print(f"[{no}] {prev['status']} - 끝난 법안이라 조회 생략")
+        return prev
+    try:
+        raw = call_api(no, key, extra={"AGE": AGE})
+        code, msg, rows = parse(raw)
+    except Exception as e:
+        code, msg, rows, raw = "연결 실패", str(e), [], None
+    if code != "INFO-000" or not rows:
+        print(f"[{no}] 결과 없음: {code} {msg}")
+        if prev:  # 일시적인 오류로 기존 데이터가 사라지지 않게 이전 값 유지
+            print(f"[{no}] 이전 데이터를 그대로 유지합니다 (마지막 확인 {prev['last_checked']})")
+        return prev
+    r = rows[0]
+
+    # 제안이유는 한 번 받으면 바뀌지 않으므로 재사용
+    if prev and prev.get("text_source", "").startswith("API"):
+        summary = {k: prev[k] for k in ("proposal_reason", "main_content", "note")}
+    else:
+        summary = fetch_summary(no, key)
+
+    # 소위 정보는 위원회에 회부되고 아직 위원회 처리 전일 때만 바뀔 수 있음
+    in_committee = r.get("COMMITTEE_DT") and not (r.get("CMT_PROC_DT") or r.get("PROC_DT"))
+    if in_committee or not prev:
+        sub = fetch_subcommittee(no, key)
+    else:
+        sub = {k: prev.get(k, "") for k in SUB_FIELDS} if any(prev.get(k) for k in SUB_FIELDS) else None
+
+    rec = to_record(r, texts, f"API 호출 성공 {today()} ({mode})", summary, sub)
+    same = prev and all(prev.get(k) == rec[k] for k in COLUMNS if k not in IGNORE_IN_COMPARE)
+    if same:
+        print(f"[{no}] 변경 없음 ({rec['status']})")
+        return prev  # 날짜 칸도 그대로 두어 파일이 바뀌지 않게 함
+    (OUT / f"raw_{no}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[{no}] {rec['bill_name']} / {rec['status']} ({rec['status_date']}) / 원문: {rec['text_source']}")
+    return rec
+
+
 def main():
     bill_nos = sys.argv[1:] or read_bill_list()
     if not bill_nos:
@@ -278,41 +367,26 @@ def main():
         return
     old_file = OUT / "bills.json"
     old_records = json.loads(old_file.read_text(encoding="utf-8")) if old_file.exists() else []
+    previous = {r["bill_id"]: r for r in old_records}
     key = load_key()
     mode = "인증키 사용" if key else "샘플 모드(인증키 없음)"
     print(f"호출 방식: {mode}")
     texts_file = BASE / "data" / "bill_texts.json"
     texts = json.loads(texts_file.read_text(encoding="utf-8")) if texts_file.exists() else {}
-
     OUT.mkdir(exist_ok=True)
-    records = []
-    previous = {r["bill_id"]: r for r in old_records}
-    for no in bill_nos:
-        try:
-            raw = call_api(no, key, extra={"AGE": AGE})
-            code, msg, rows = parse(raw)
-        except Exception as e:
-            code, msg, rows, raw = "연결 실패", str(e), [], None
-        if code != "INFO-000" or not rows:
-            print(f"[{no}] 결과 없음: {code} {msg}")
-            if no in previous:  # 일시적인 오류로 기존 데이터가 사라지지 않게 이전 값 유지
-                print(f"[{no}] 이전 데이터를 그대로 유지합니다 (마지막 확인 {previous[no]['last_checked']})")
-                records.append(previous[no])
-            continue
-        (OUT / f"raw_{no}.json").write_text(json.dumps(raw, ensure_ascii=False, indent=2), encoding="utf-8")
-        api_status = f"API 호출 성공 {today()} ({mode})"
-        summary = fetch_summary(no, key)
-        sub = fetch_subcommittee(no, key)
-        for r in rows:
-            rec = to_record(r, texts, api_status, summary, sub)
-            records.append(rec)
-            print(f"[{no}] {rec['bill_name']} / {rec['proposer']} / {rec['status']} ({rec['status_date']})"
-                  f" / 원문: {rec['text_source']}")
 
-    if records:
+    if not sys.argv[1:]:  # 자동 업데이트(목록 실행)일 때만 새 법안 확인
+        detect_new_bills(key)
+
+    records = [rec for no in bill_nos if (rec := update_bill(no, previous.get(no), key, texts, mode))]
+
+    if records and records != old_records:
         record_changes(old_records, records)
         save(records)
         print(f"저장 완료: {OUT}")
+    else:
+        print("추적 중인 법안에 변경 없음 - 파일을 고치지 않았습니다")
+    print(f"이번 실행의 API 호출: {CALLS['n']}회")
 
 
 if __name__ == "__main__":
