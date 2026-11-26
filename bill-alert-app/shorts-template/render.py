@@ -6,6 +6,9 @@
 
 - 모든 문구는 JSON(schema.json)에서 읽는다. 디자인(색·폰트·배치·애니메이션·장면 길이)은
   bill-alert-app/shorts/make_shorts.py(승인된 건보 특사경법 쇼츠)와 동일하다.
+- 글자 규칙: 화면에 나오는 문구에 단어 사이 중간점(· ㆍ • ‧ ･)을 쓰지 않는다.
+  들어 있으면 검증 단계에서 오류로 멈춘다. 렌더러가 자동으로 붙이는 구분자도 중간점 대신
+  쉼표와 콜론을 쓴다. 규칙 이전에 만든 영상을 그대로 재현할 때만 JSON에 "allow_middle_dot": true.
 - --preview : 장면별로 요소가 모두 등장한 시점의 1080x1920 PNG + 컨택트시트만 저장
 - 전체 렌더 : 장면별 mp4 → concat(-c copy) → 합성 패드 음악 추가 → OUT_DIR/<id>_쇼츠.mp4
 """
@@ -53,7 +56,44 @@ MIN_GAP = 24              # 흐름 배치 시 요소 사이 최소 간격
 
 SCENE_DUR = {'hook': 4.6, 'what': 7.2, 'pro': 8.0, 'con': 7.6, 'status': 10.0, 'next': 6.4}
 SCENE_ORDER = ['hook', 'what', 'pro', 'con', 'status', 'next']
-DEFAULT_STAGE_LABELS = ['발의', '소관위 회부', '소관위 심사', '법사위 체계·자구', '본회의', '정부 이송·공포']
+DEFAULT_STAGE_LABELS = ['발의', '소관위 회부', '소관위 심사', '법사위 심사', '본회의', '정부 이송과 공포']
+LEGACY_STAGE_LABELS = ['발의', '소관위 회부', '소관위 심사', '법사위 체계·자구', '본회의', '정부 이송·공포']
+MIDDLE_DOTS = '·ㆍ•‧･'   # 화면 문구에 쓰면 안 되는 중간점 종류
+
+
+def legacy(data):
+    """중간점 규칙 이전에 만든 영상(원본 재현용)인지."""
+    return data.get('allow_middle_dot') is True
+
+
+def seps(data):
+    """렌더러가 자동으로 붙이는 구분자. 기본은 중간점 없이, 예전 영상 재현 때만 원래 모양."""
+    if legacy(data):
+        return {'date': ' · ', 'side': ' · ', 'src': '·', 'labels': LEGACY_STAGE_LABELS}
+    return {'date': ', ', 'side': ': ', 'src': ', ', 'labels': DEFAULT_STAGE_LABELS}
+
+
+def screen_texts(data):
+    """(필드 경로, 화면에 나오는 문구) 목록. bill_meta와 출처 제목·URL은 화면에 안 나와서 제외."""
+    out = []
+
+    def add(path, v):
+        if isinstance(v, str) and v.strip():
+            out.append((path, v))
+        elif isinstance(v, list):
+            for i, x in enumerate(v):
+                add(f'{path}[{i}]', x)
+        elif isinstance(v, dict):
+            for k, x in v.items():
+                add(f'{path}.{k}', x)
+
+    for key in ('category', 'hook', 'what', 'pro', 'con', 'status', 'next'):
+        if key in data:
+            add(key, data[key])
+    for i, src in enumerate(data.get('sources') or []):
+        if isinstance(src, dict):
+            add(f'sources[{i}].outlet', src.get('outlet'))
+    return out
 
 
 class FitError(ValueError):
@@ -304,7 +344,7 @@ def validate(data):
     st = data.get('status', {})
     stage = st.get('stage')
     if not isinstance(stage, int) or isinstance(stage, bool) or not 0 <= stage <= 5:
-        errs.append('status.stage: 0~5 정수여야 합니다 (0 발의, 1 소관위 회부, 2 소관위 심사, 3 법사위 체계·자구, 4 본회의, 5 정부 이송·공포)')
+        errs.append('status.stage: 0~5 정수여야 합니다 (0 발의, 1 소관위 회부, 2 소관위 심사, 3 법사위 심사, 4 본회의, 5 정부 이송과 공포)')
     for key, lo, hi in [('labels', 6, 6), ('details', 6, 6)]:
         v = st.get(key)
         if v is not None and not (isinstance(v, list) and lo <= len(v) <= hi):
@@ -330,6 +370,11 @@ def validate(data):
             errs.append(f'{side}.cards: 최대 2개')
     if side_present(data.get('pro')) != side_present(data.get('con')):
         errs.append('pro/con: 찬성과 반대는 균형을 위해 둘 다 채우거나 둘 다 비워야 합니다')
+    if not legacy(data):
+        for path, txt in screen_texts(data):
+            if any(ch in txt for ch in MIDDLE_DOTS):
+                errs.append(f'{path}: 단어 사이 중간점을 쓰지 마세요 → "{txt}" '
+                            f'(쉼표, "와/과", 띄어쓰기로 바꾸기. 예: "교통·안전" → "교통 안전")')
     srcs = data.get('sources') or []
     for i, s in enumerate(srcs):
         if not isinstance(s, dict) or not nonempty(s.get('outlet')):
@@ -344,7 +389,7 @@ def fmt_date(iso):
     return f'{d.year}.{d.month:02d}.{d.day:02d}'
 
 
-def balanced_wrap(prefix, items, suffix, font, max_w, sep='·'):
+def balanced_wrap(prefix, items, suffix, font, max_w, sep=', '):
     """출처 문구: 한 줄에 들어가면 한 줄, 아니면 두 줄의 최대폭이 최소가 되게 구분자에서 나눔."""
     full = prefix + sep.join(items) + suffix
     if font.getlength(full) <= max_w:
@@ -352,6 +397,7 @@ def balanced_wrap(prefix, items, suffix, font, max_w, sep='·'):
     best = None
     for k in range(1, len(items)):
         a = prefix + sep.join(items[:k]) + sep
+        a = a.rstrip() if sep.strip() else a
         b = sep.join(items[k:]) + suffix
         m = max(font.getlength(a), font.getlength(b))
         if best is None or m < best[0]:
@@ -368,6 +414,7 @@ def build_scenes(data):
     present += ['status', 'next']
     total = len(present)
     scenes = []
+    sp = seps(data)
 
     def new(name):
         s = Scene(name, SCENE_DUR[name], len(scenes), total)
@@ -384,7 +431,7 @@ def build_scenes(data):
     ty = fl.place(title, 400)
     s.add(title, L, ty, 0.35)
     # 제목이 4줄보다 짧으면 법안명·상태 칩을 위로 당겨 빈 공간을 줄임 (4줄일 때 원본과 동일: 1000, 1100)
-    sub = fit_text_el('hook.bill_name', [f"{hk['bill_name']} · {fmt_date(data['as_of'])} 기준"], 34, 28, 'm', MUTED)
+    sub = fit_text_el('hook.bill_name', [f"{hk['bill_name']}{sp['date']}{fmt_date(data['as_of'])} 기준"], 34, 28, 'm', MUTED)
     sy = ty + title.height + 91
     s.add(sub, L, fl.place(sub, sy), 1.0)
     chip = fit_chip_el('hook.status', f"현재: {hk['status']}", 38, 32, 30, fg=(20, 12, 4), bg=ORANGE + (255,), pady=16)
@@ -413,9 +460,9 @@ def build_scenes(data):
             sd = data[side]
             s = new(side)
             if side == 'pro':
-                chip = fit_chip_el('pro.who', f"찬성 · {sd['who']}", 36, 30, 28, fg=(8, 30, 18), bg=GREEN + (255,), pady=14)
+                chip = fit_chip_el('pro.who', f"찬성{sp['side']}{sd['who']}", 36, 30, 28, fg=(8, 30, 18), bg=GREEN + (255,), pady=14)
             else:
-                chip = fit_chip_el('con.who', f"반대 · {sd['who']}", 36, 30, 28, fg=(30, 8, 8), bg=(255, 120, 120, 255), pady=14)
+                chip = fit_chip_el('con.who', f"반대{sp['side']}{sd['who']}", 36, 30, 28, fg=(30, 8, 8), bg=(255, 120, 120, 255), pady=14)
             s.add(chip, L, 300, 0.1)
             fl = Flow(side)
             fl.bottom = 300 + chip.height
@@ -451,7 +498,7 @@ def build_scenes(data):
     st = data['status']
     s = new('status')
     s.add(text_el(['지금 어디까지 왔나?'], 64, 'bk'), L, 290, 0.1)
-    labels = st.get('labels') or DEFAULT_STAGE_LABELS
+    labels = st.get('labels') or sp['labels']
     details = st.get('details') or [''] * 6
     stage = st['stage']
     steps = [(labels[i], details[i] or '', 'done' if i < stage else ('now' if i == stage else 'todo')) for i in range(6)]
@@ -536,7 +583,7 @@ def build_scenes(data):
     suffix = f' ({source_period(data)} 보도 종합)'
     src_lines, size = None, 28
     while size >= 22:
-        src_lines = balanced_wrap('출처: ', outlets, suffix, F('r', size), CONTENT_W)
+        src_lines = balanced_wrap('출처: ', outlets, suffix, F('r', size), CONTENT_W, sp['src'])
         if src_lines:
             break
         size -= 2
@@ -548,7 +595,7 @@ def build_scenes(data):
 
 
 def meta_cards(meta):
-    """what.cards가 비었을 때 bill_meta(발의자·발의일·소관위)로 대체 카드를 만들어 빈 화면을 피함."""
+    """what.cards가 비었을 때 bill_meta(발의자, 발의일, 소관위)로 대체 카드를 만들어 빈 화면을 피함."""
     out = []
     lines = [x for x in [meta.get('proposer', ''), meta.get('proposed_date', '')] if nonempty(x)]
     if lines:

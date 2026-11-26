@@ -4,6 +4,12 @@
 **문구만 JSON으로 바꿔 끼우면** 다른 법안 쇼츠가 나오도록 만든 템플릿입니다.
 JSON은 사람이 직접 써도 되고, `prompt.md`로 LLM에게 만들게 해도 됩니다.
 
+> **글자 규칙: 화면 문구에 단어 사이 중간점(·)을 쓰지 않습니다.**
+> 나열은 쉼표, "와/과", 띄어쓰기로 씁니다(예: "교통·안전" → "교통 안전", "의협·병협" → "의협, 병협").
+> `render.py`는 중간점이 든 필드를 찾아 오류로 멈추고, 스스로 붙이는 구분자도 중간점 없이 씁니다
+> ("찬성: ○○", "○○, 2026.11.26 기준", "출처: A, B").
+> 규칙 이전에 만든 `gb-tsg.json`, `elder-care-housing.json`만 원래 영상을 그대로 재현하려고 `"allow_middle_dot": true`로 예외 처리했습니다.
+
 - 1080×1920 세로, 30fps, 장면 6개(약 44초) — 찬반 자료가 없으면 4개(약 28초)
 - 어두운 배경 · 파랑 강조 · 현재 단계 주황 · Noto Sans CJK KR (원본과 픽셀 단위로 동일하게 렌더됨을 확인)
 
@@ -17,9 +23,12 @@ shorts-template/
 ├── data/
 │   ├── gb-tsg.json                     # 원본 쇼츠(건보 특사경법)를 그대로 재현하는 데이터
 │   ├── elder-care-housing.sources.md   # 두 번째 법안의 [자료] (기사 URL 포함)
-│   └── elder-care-housing.json         # prompt.md를 적용해 만든 데이터
+│   ├── elder-care-housing.json         # prompt.md를 적용해 만든 데이터
+│   ├── pm-law(.sources.md/.json)       # PM법 (중간점 규칙 적용)
+│   └── otc-law(.sources.md/.json)      # 편의점 상비약 약사법 개정안 (중간점 규칙 적용)
 ├── tests/minimal.json        # 필수 필드만 채운 검증용 데이터(찬반·다음 단계 없음, 가상의 예시)
 ├── outputs/                  # 최종 mp4 (elder-care-housing_쇼츠.mp4만 커밋)
+│                             #   완성 영상 모음은 ../shorts/ (특사경법, 고령자돌봄주택법, PM법, 편의점상비약법)
 └── build/                    # 임시 파일(장면 mp4, 미리보기) — git 제외
 ```
 
@@ -38,7 +47,7 @@ shorts-template/
 - `next.lines`가 비면 "국회 단계가 바뀔 때마다 바로 알려드려요" 기본 문구와 알림 버튼을 보여 줍니다.
 - 후킹 제목이 4줄보다 짧으면 법안명·상태 칩이 위로 올라와 빈 공간을 줄입니다.
 - `**강조**` 표기는 `hook.title_lines`(파랑), `what.summary_lines`·`next.lines`(주황)에서만 색이 바뀝니다.
-- 진행 단계: 0 발의 · 1 소관위 회부 · 2 소관위 심사 · 3 법사위 체계·자구 · 4 본회의 · 5 정부 이송·공포.
+- 진행 단계: 0 발의, 1 소관위 회부, 2 소관위 심사, 3 법사위 심사, 4 본회의, 5 정부 이송과 공포.
   소관위가 법사위인 법안은 `status.labels`로 단계 이름을 바꿉니다(`data/gb-tsg.json`, `prompt.md` 3절 참고).
 
 ## JSON 만들기 (prompt.md 사용)

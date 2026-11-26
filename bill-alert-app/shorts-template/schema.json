@@ -9,7 +9,8 @@
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "파일명용 영문 ID (예: gb-tsg)"},
     "as_of": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "자료 기준일 YYYY-MM-DD. 화면에 'YYYY.MM.DD 기준'으로 표시"},
-    "category": {"type": "string", "minLength": 1, "maxLength": 10, "description": "관심 분야 칩 (예: 의료·보건)"},
+    "allow_middle_dot": {"type": "boolean", "description": "중간점 규칙 이전에 만든 영상을 그대로 재현할 때만 true. 새 법안에는 쓰지 않는다(기본 false: 화면 문구에 중간점이 있으면 렌더러가 오류로 멈춤)"},
+    "category": {"type": "string", "minLength": 1, "maxLength": 10, "description": "관심 분야 칩 (예: 의료 보건). 중간점 금지"},
     "bill_meta": {
       "type": "object",
       "description": "화면에는 안 나오는 메타데이터(앱 연동·검수용)",
@@ -29,7 +30,7 @@
       "required": ["title_lines", "bill_name", "status"],
       "properties": {
         "title_lines": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "string"}, "description": "후킹 제목, 줄마다 하나. **강조** 가능"},
-        "bill_name": {"type": "string", "minLength": 1, "description": "법안 이름(짧게). 뒤에 ' · YYYY.MM.DD 기준'이 자동으로 붙음"},
+        "bill_name": {"type": "string", "minLength": 1, "description": "법안 이름(짧게). 뒤에 ', YYYY.MM.DD 기준'이 자동으로 붙음"},
         "status": {"type": "string", "minLength": 1, "description": "현재 상태 한 줄. 앞에 '현재: '가 자동으로 붙음"}
       }
     },
@@ -58,7 +59,7 @@
       "additionalProperties": false,
       "required": ["stage", "chip"],
       "properties": {
-        "stage": {"type": "integer", "minimum": 0, "maximum": 5, "description": "0 발의, 1 소관위 회부, 2 소관위 심사, 3 법사위 체계·자구, 4 본회의, 5 정부 이송·공포"},
+        "stage": {"type": "integer", "minimum": 0, "maximum": 5, "description": "0 발의, 1 소관위 회부, 2 소관위 심사, 3 법사위 심사, 4 본회의, 5 정부 이송과 공포"},
         "chip": {"type": "string", "minLength": 1, "maxLength": 6, "description": "현재 단계 옆 주황 칩 (예: 심사 중, 보류, 계류)"},
         "labels": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "string", "minLength": 1}, "description": "단계 이름 6개(생략 시 기본값). 소관위가 법사위인 경우 등에만 바꿈"},
         "details": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "string"}, "description": "단계별 보조 설명 6개(모르면 빈 문자열)"}
@@ -93,7 +94,7 @@
       "additionalProperties": false,
       "description": "찬성 측. 자료가 없으면 객체 전체를 생략(또는 빈 값). 반대 측과 함께 있어야 장면이 나옴",
       "properties": {
-        "who": {"type": "string", "description": "찬성 주체. 칩에 '찬성 · '이 자동으로 붙음"},
+        "who": {"type": "string", "description": "찬성 주체. 칩에 '찬성: '이 자동으로 붙음"},
         "quote_lines": {"type": "array", "maxItems": 2, "items": {"type": "string"}, "description": "핵심 주장 요지, 따옴표는 자동"},
         "cards": {
           "type": "array", "maxItems": 2,
