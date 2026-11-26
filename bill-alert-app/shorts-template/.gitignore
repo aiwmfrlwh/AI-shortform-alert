@@ -1,0 +1,7 @@
+# 렌더 임시 파일(장면별 mp4, 미리보기 PNG, 패드 wav 등)
+build/
+__pycache__/
+*.tmp.mp4
+# 최종 영상은 커밋할 것만 예외로 추가
+outputs/*.mp4
+!outputs/elder-care-housing_쇼츠.mp4
