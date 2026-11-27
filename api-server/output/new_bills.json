@@ -1,5 +1,453 @@
 [
   {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223314",
+    "bill_name": "디지털자산업의 혁신과 이용자 보호에 관한 법률안",
+    "proposer": "유동수의원 등 12인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_D5BD6C07B5484BB0989ED8EB04B59B&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223313",
+    "bill_name": "아동학대범죄의 처벌 등에 관한 특례법 일부개정법률안",
+    "proposer": "황운하의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_12A3F023C99443099C367E670ECA0B&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223312",
+    "bill_name": "가정폭력방지 및 피해자보호 등에 관한 법률 일부개정법률안",
+    "proposer": "황운하의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_A3F5D4B8D3F84163A0C63DC4C926CC&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223311",
+    "bill_name": "초·중등교육법 일부개정법률안",
+    "proposer": "김문수의원 등 12인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_A2B6Z0Z9Y2U3U1S8T0S0S2Q9R2Z5X9&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223310",
+    "bill_name": "세무사법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_21E0558400704B958D73B86D16050D&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223309",
+    "bill_name": "변리사법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_E6BBA9818840409C920295A45C9EA5&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223308",
+    "bill_name": "변호사시험법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_831AB1E086DC445C80CF73E64D2578&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223307",
+    "bill_name": "관세사법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_D4F5F54501774AA5BEDE2976BF7B55&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223306",
+    "bill_name": "공인회계사법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_EC45ED9794914CB6B98CE83E89C2FC&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223305",
+    "bill_name": "공인노무사법 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_9F904FCAE2F04361BEAAD92CC37B2B&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223304",
+    "bill_name": "감정평가 및 감정평가사에 관한 법률 일부개정법률안",
+    "proposer": "김태호의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_5F4D5E9145874D989764FAFBAC0023&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223303",
+    "bill_name": "국가유산기본법 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_973CEC93F2EB4CD2A67ECFD0669231&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223302",
+    "bill_name": "문신사법 일부개정법률안",
+    "proposer": "서영석의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_9240482FE4634BD6BDC001A18BEEDD&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223301",
+    "bill_name": "게임산업진흥에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_0CC2C6DEB2124AB8AC4F4393D8B77C&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223300",
+    "bill_name": "자연유산의 보존 및 활용에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_B40F7D39FE36487BA444478597673D&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223299",
+    "bill_name": "역사문화권 정비 등에 관한 특별법 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_EA82D25C7FC248BB8B2DD07AC26C04&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223298",
+    "bill_name": "세계유산의 보존·관리 및 활용에 관한 특별법 일부개정법률안",
+    "proposer": "조계원의원 등 12인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_E4F14F68937A464ABCD52A91612B69&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223297",
+    "bill_name": "문화유산의 보존 및 활용에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_3752C639830F4062B745C904E4D2E3&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223296",
+    "bill_name": "문화유산과 자연환경자산에 관한 국민신탁법 일부개정법률안",
+    "proposer": "조계원의원 등 12인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_007F1B9BDC9D4C55845DD6619C1A31&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223295",
+    "bill_name": "무형유산의 보전 및 진흥에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_86230B7EF1884942857DC90FB63F2A&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223294",
+    "bill_name": "매장유산 보호 및 조사에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_ACAA2BB3B54B4EBA8F184CF95134A5&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223293",
+    "bill_name": "근현대문화유산의 보존 및 활용에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_CBA5A3622FE947D4A19A82774C7CB5&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223292",
+    "bill_name": "고도 보존 및 육성에 관한 특별법 일부개정법률안",
+    "proposer": "조계원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_D9E3D420AB174156ABB871ED4E45E6&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223291",
+    "bill_name": "국가유산영향진단법 일부개정법률안",
+    "proposer": "조계원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_9BDE7419B04949A790EBDD0345F9F2&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223290",
+    "bill_name": "국가유산수리 등에 관한 법률 일부개정법률안",
+    "proposer": "조계원의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_27BF66CB87CF4E41B8602658B34863&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223289",
+    "bill_name": "가정폭력범죄의 처벌 등에 관한 특례법 일부개정법률안",
+    "proposer": "황운하의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_F247D8AEFA8541309BD3F287D4D603&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223288",
+    "bill_name": "예술인의 지위와 권리의 보장에 관한 법률 일부개정법률안",
+    "proposer": "김재원의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_E2F6D0C9C0A4B1J0K2I9I5H8F0G7C9&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223287",
+    "bill_name": "소나무재선충병 방제특별법 일부개정법률안",
+    "proposer": "윤재옥의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_5052FB5EC92349A69BAFB68AB542C0&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223286",
+    "bill_name": "전남광주통합특별시 설치에 따른 지방행정체제 개편 반영을 위한 행정안전부 소관 18개 법률의 일부개정에 관한 법률안",
+    "proposer": "양부남의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_A239F144BFC94DCE85177B0EE9E52B&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223285",
+    "bill_name": "전남광주통합특별시 설치에 따른 지방행정체제 개편 반영을 위한 행정안전부 소관 31개 법률의 일부개정에 관한 법률안",
+    "proposer": "양부남의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_20A1BFA8A50B40379B62187B276E60&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223284",
+    "bill_name": "통신비밀보호법 일부개정법률안",
+    "proposer": "박지원의원 등 14인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_56A852EA232A46B3B0EDB27837382C&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223283",
+    "bill_name": "환자기본법 일부개정법률안",
+    "proposer": "소병훈의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_21BFE1EA07D14ED8807DD548F8C0DB&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223282",
+    "bill_name": "서예진흥에 관한 법률 일부개정법률안",
+    "proposer": "이정문의원 등 13인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_AE49697C1B424DAB914C1272EFA4FE&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223281",
+    "bill_name": "문화예술진흥법 일부개정법률안",
+    "proposer": "이정문의원 등 13인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_EC1617D7408640FD9C44AB2EF83430&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223280",
+    "bill_name": "문화예술교육 지원법 일부개정법률안",
+    "proposer": "이정문의원 등 13인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_BEBF257618DB4B3C98F581F4AB3444&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223279",
+    "bill_name": "문화산업진흥 기본법 일부개정법률안",
+    "proposer": "이정문의원 등 13인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_F45D1328C90146E190A48952F93476&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223278",
+    "bill_name": "초·중등교육법 일부개정법률안",
+    "proposer": "김용민의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_2AF7545D9B9F42219E1B46793D46E1&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223277",
+    "bill_name": "문화다양성의 보호와 증진에 관한 법률 일부개정법률안",
+    "proposer": "이정문의원 등 13인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_B42F06E06EFE4CD5A458D87C9D9911&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223276",
+    "bill_name": "부패방지 및 국민권익위원회의 설치와 운영에 관한 법률 일부개정법률안",
+    "proposer": "김형연의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_9D94676747CE4565BE403CA6D9A00C&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223275",
+    "bill_name": "산업안전보건법 일부개정법률안",
+    "proposer": "김위상의원 등 12인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_257BB909E11A49FCB3EF1F59E09973&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223274",
+    "bill_name": "사회복지사업법 일부개정법률안",
+    "proposer": "백선희의원 등 17인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_D367D23028094647BE5387CC2D6DF4&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223273",
+    "bill_name": "낚시 관리 및 육성법 일부개정법률안",
+    "proposer": "문금주의원 등 15인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_E098DD5DC025473EAD895985673CF4&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223272",
+    "bill_name": "평생교육법 일부개정법률안",
+    "proposer": "고민정의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_C4ADA5C0433A4E9B97D1818E854E12&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223271",
+    "bill_name": "지속가능발전 기본법 일부개정법률안",
+    "proposer": "박지혜의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_C4BE90BE637B4033BCEE0BE8835AD0&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223269",
+    "bill_name": "산업전환에 따른 고용안정 지원 등에 관한 법률 일부개정법률안",
+    "proposer": "어기구의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_059A06EA1B534EFC985772EAC73425&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223268",
+    "bill_name": "가덕도신공항 건설을 위한 특별법 일부개정법률안",
+    "proposer": "복기왕ㆍ정동만의원 등 41인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_D3F0EDD0F7894084BE1E27B1C812EE&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223267",
+    "bill_name": "형사소송법 일부개정법률안",
+    "proposer": "박은정의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_BD6B3A6FE819461890643164D202C2&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223266",
+    "bill_name": "전자장치 부착 등에 관한 법률 일부개정법률안",
+    "proposer": "박은정의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_7C345F28676E483092F5537BDF887B&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223265",
+    "bill_name": "대기환경보전법 일부개정법률안",
+    "proposer": "이종배의원 등 14인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_6C008D25DA2A4245870B1B3C5FDE68&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223264",
+    "bill_name": "성폭력범죄의 처벌 등에 관한 특례법 일부개정법률안",
+    "proposer": "박은정의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_CB87F1F1AE6B44C6A894A26494533A&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223263",
+    "bill_name": "소년법 일부개정법률안",
+    "proposer": "서영교의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_EA85F4FD06D14A70AA50DC236BC93D&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223262",
+    "bill_name": "윤석열 정권 검찰청, 국가정보원, 감사원 등 국가기관의 조작수사·조작기소 등 의혹의 진상규명을 위한 특별검사 임명 등에 관한 법률 일부개정법률안",
+    "proposer": "김재섭의원 등 11인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_CFE6E4D9F30E4B0989337406B4A6E8&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223261",
+    "bill_name": "어린이제품 안전 특별법 일부개정법률안",
+    "proposer": "차규근의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_978E962E682D4BE38687ECC44ACD13&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223260",
+    "bill_name": "적합성평가 관리 등에 관한 법률 일부개정법률안",
+    "proposer": "차규근의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_8DE07D476EA547EDAC4025F75563AF&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223259",
+    "bill_name": "대한민국과 미합중국 간 전략적투자의 운영 및 관리를 위한 특별법 일부개정법률안",
+    "proposer": "차규근의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_5729F8B4112B48ABA45B1891C1BADF&ageFrom=22&ageTo=22"
+  },
+  {
+    "detected_date": "2026-11-27",
+    "bill_id": "2223258",
+    "bill_name": "자본시장과 금융투자업에 관한 법률 일부개정법률안",
+    "proposer": "신장식ㆍ김남근ㆍ한창민의원 등 10인",
+    "propose_date": "2026-11-26",
+    "original_url": "https://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_I2J6H0I8H0F5F1B1C1A4B0Z7Z4Y3G6&ageFrom=22&ageTo=22"
+  },
+  {
     "detected_date": "2026-11-26",
     "bill_id": "2223257",
     "bill_name": "스토킹범죄의 처벌 등에 관한 법률 일부개정법률안",
