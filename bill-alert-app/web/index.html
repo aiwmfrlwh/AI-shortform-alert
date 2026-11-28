@@ -471,7 +471,7 @@ function viewWelcome(){
     <div class="card" style="box-shadow:0 8px 24px rgba(22,24,29,.06)"><div class="row"><span class="cat">${esc(tsg.cat)}</span><span class="mut sm">방금</span></div>
       <div class="bt" style="font-size:15px">${esc(tsg.short)}</div>${bar(tsg)}<div class="st"><b>${esc(tsg.status)}</b></div></div>
     <div style="display:flex;flex-direction:column;gap:14px;flex:1">${feat('bell','발의부터 공포까지, 단계별 진행 알림')}${feat('shorts','어려운 법안도 1분 쇼츠로 쉽게')}${feat('scale','찬성과 반대, 양쪽 근거를 함께')}</div>
-    <div><a class="cta" href="#interests">시작하기</a><button class="link-btn" data-act="skip">먼저 둘러볼게요</button></div></div>`;
+    <div><a class="cta" href="#interests">시작하기</a></div></div>`;
 }
 
 function viewInterests(){
@@ -481,7 +481,7 @@ function viewInterests(){
     <div><h1 style="font-size:26px">어떤 분야의 법안이<br>궁금하세요?</h1><p class="mut" style="margin:8px 0 0;font-size:15px">고른 분야의 법안 소식과 쇼츠를 먼저 보여드려요. 언제든 바꿀 수 있어요.</p></div>
     <div class="chips" style="flex:1;align-content:flex-start">${CATS.map(c => `<button class="chip" data-cat="${c}" aria-pressed="${S.interests.includes(c)}">${c}</button>`).join('')}</div>
     <div><p class="mut sm" style="text-align:center;margin:0 0 10px"><b style="color:var(--ink)">${n}개</b> 선택됨 · 3개 이상 추천</p>
-    <button class="cta" data-act="${edit ? 'saveInterests' : 'toNotify'}" ${n ? '' : 'disabled'}>${edit ? '저장' : '다음'}</button></div></div>`;
+    <button class="cta" data-act="${edit ? 'saveInterests' : 'toNotify'}" ${n ? '' : 'disabled'}>${edit ? '저장' : '다음'}</button>${edit ? '' : '<button class="link-btn" data-act="skipInterests">다음에 선택하기</button>'}</div></div>`;
 }
 
 function viewNotify(){
@@ -492,7 +492,7 @@ function viewNotify(){
     <div><div class="push"><span class="logo" style="width:38px;height:38px;border-radius:10px;flex:none">${ic('bldg',20)}</span><span style="flex:1"><span class="row"><b style="font-size:13px">법안톡</b><span class="mut" style="font-size:12px">지금</span></span><span style="font-size:14px;line-height:1.45;display:block">${prev}</span></span></div>
     <p class="mut" style="font-size:12px;text-align:center;margin:8px 0 0">알림 미리보기</p></div>
     <div role="radiogroup" aria-label="받는 방식" style="display:flex;flex-direction:column;gap:10px;flex:1">${opt('instant','즉시 알림','단계가 바뀌는 순간 바로 받아요')}${opt('digest','하루 한 번 요약','매일 아침 8시, 하루치 변화를 모아서')}</div>
-    <div><button class="cta" data-act="finish" data-perm="1">${ic('bell',18)}알림 켜고 시작하기</button><button class="link-btn" data-act="finish">나중에 할게요</button></div></div>`;
+    <div><button class="cta" data-act="finish" data-perm="1">${ic('bell',18)}알림 켜고 시작하기</button><button class="link-btn" data-act="finish">아직 알림을 받지 않을게요</button></div></div>`;
 }
 
 function viewHome(){
@@ -750,6 +750,7 @@ view.addEventListener('click', e => {
   else if (d.mode) { S.mode = d.mode; }
   else if (d.alerttab) { S.alertTab = d.alerttab; }
   else if (d.noti) { const n = allNotis().find(x => x.id === d.noti); if (!S.read.includes(n.id)) S.read.push(n.id); save(); keepScroll = false; location.hash = 'bill-' + n.bill; return; }
+  else if (d.act === 'skipInterests') { S.interests = []; save(); keepScroll = false; location.hash = 'notify'; return; }
   else if (d.act === 'toNotify') { save(); keepScroll = false; location.hash = 'notify'; return; }
   else if (d.act === 'saveInterests') { save(); keepScroll = false; toast('관심 분야 ' + S.interests.length + '개를 저장했어요'); location.hash = 'library'; return; }
   else if (d.act === 'skip' || d.act === 'finish') {
