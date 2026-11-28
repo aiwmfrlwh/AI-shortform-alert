@@ -1,0 +1,4 @@
+# 렌더 임시 파일(장면별 mp4, 미리보기 PNG, 패드 wav 등). 완성 영상은 data/bills/<id>/shorts.mp4
+build/
+__pycache__/
+*.tmp.mp4

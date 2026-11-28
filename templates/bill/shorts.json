@@ -1,0 +1,30 @@
+{
+  "id": "__ID__",
+  "as_of": "YYYY-MM-DD",
+  "category": "",
+  "bill_meta": {
+    "official_name": "",
+    "bill_no": "",
+    "proposer": "",
+    "proposed_date": "",
+    "committee": ""
+  },
+  "hook": {
+    "title_lines": [],
+    "bill_name": "",
+    "status": ""
+  },
+  "what": {
+    "summary_lines": [],
+    "cards": []
+  },
+  "pro": {},
+  "con": {},
+  "status": {
+    "stage": 0,
+    "chip": "",
+    "details": ["", "", "", "", "", ""]
+  },
+  "next": {},
+  "sources": []
+}

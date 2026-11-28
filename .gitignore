@@ -1,0 +1,4 @@
+# 배포용으로 만들어지는 폴더 (scripts/build_site.py)
+_site/
+__pycache__/
+.DS_Store

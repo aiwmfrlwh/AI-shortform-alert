@@ -1,0 +1,17 @@
+{
+  "bill_order": [
+    "gb-tsg",
+    "elder-care-housing",
+    "pm-law",
+    "otc-law"
+  ],
+  "welcome_bill": "gb-tsg",
+  "default_follow": [
+    "gb-tsg"
+  ],
+  "default_interests": [
+    "의료·보건",
+    "주거·부동산",
+    "교통"
+  ]
+}
