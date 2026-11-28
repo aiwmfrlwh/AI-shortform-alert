@@ -655,7 +655,7 @@ function viewHome(){
   const f = (k, l) => `<button class="pill" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`;
   const tip = TERMS[(new Date().getDate()) % TERMS.length];
   return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18)}</span>법안톡</div>
-    <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
+</div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
     <div><p class="mut sm" style="margin:0 0 2px">입법 소식 · ${TODAY.slice(5).replace('-', '.')} 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
     <button class="searchbar" data-go="search">${ic('search',20)}<span>법안 이름이나 생활 단어로 찾기</span></button>
