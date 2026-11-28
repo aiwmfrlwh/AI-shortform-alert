@@ -1,5 +1,5 @@
-# 2시간마다 국회 API를 확인해서, 새 법안이 발의됐거나 추적 중인 법안(data/assembly/tracked.json)의
-# 상태가 바뀌었을 때만 data/assembly/ 를 고쳐 저장소에 올린다. 바뀐 게 없으면 아무것도 올리지 않는다.
+# 2시간마다 국회 API를 확인해서, 새 법안이 발의됐거나 추적 중인 법안(api-server/bills.txt)의
+# 상태가 바뀌었을 때만 api-server/output 을 고쳐 저장소에 올린다. 바뀐 게 없으면 아무것도 올리지 않는다.
 # 한 번 확인에 쓰는 API 호출: 새 법안 확인 1회 + 진행 중인 법안당 1~2회 (끝난 법안은 0회)
 # Actions 탭에서 "Run workflow" 버튼으로 바로 실행할 수도 있다.
 name: Update bills
@@ -30,7 +30,7 @@ jobs:
         run: pip install -q openpyxl
 
       - name: Check for changes
-        working-directory: collector
+        working-directory: api-server
         env:
           ASSEMBLY_API_KEY: ${{ secrets.ASSEMBLY_API_KEY }}  # 없으면 샘플 모드로 동작
         run: python fetch_bill.py
@@ -39,11 +39,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/assembly
+          git add api-server/output
           if git diff --cached --quiet; then
             echo "변경 없음 - 커밋하지 않음"
             exit 0
           fi
-          git commit -q -m "data/assembly: 법안 변경 감지 자동 업데이트 $(TZ=Asia/Seoul date '+%F %H:%M')"
+          git commit -q -m "api-server: 법안 변경 감지 자동 업데이트 $(TZ=Asia/Seoul date '+%F %H:%M')"
           git pull -q --rebase origin main
           git push -q origin HEAD:main

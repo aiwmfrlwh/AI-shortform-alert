@@ -1,0 +1,40 @@
+{
+  "id": "minimal-test",
+  "as_of": "2026-11-26",
+  "category": "테스트",
+  "hook": {
+    "title_lines": [
+      "찬반 자료가 없는",
+      "**최소 입력** 예시"
+    ],
+    "bill_name": "예시 법률 일부개정법률안",
+    "status": "본회의 통과 후 공포"
+  },
+  "what": {
+    "summary_lines": [
+      "필수 필드만 채운",
+      "검증용 데이터예요"
+    ]
+  },
+  "pro": {},
+  "con": {
+    "who": "",
+    "quote_lines": [],
+    "cards": []
+  },
+  "status": {
+    "stage": 5,
+    "chip": "공포"
+  },
+  "next": {},
+  "sources": [
+    {
+      "outlet": "국회 의안정보시스템"
+    }
+  ],
+  "bill_meta": {
+    "proposer": "홍길동 의원 등 10인",
+    "proposed_date": "2026-03-02",
+    "committee": "국토교통위원회"
+  }
+}

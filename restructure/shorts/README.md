@@ -65,7 +65,7 @@ data/bills/<id>/
 ## 렌더하기
 
 ```bash
-# 저장소 맨 위 폴더에서
+# restructure/ 폴더에서
 python3 shorts/render.py data/bills/pm-law/shorts.json --preview   # shorts/build/<id>/preview/ 에 장면별 PNG + contact.png
 python3 shorts/render.py data/bills/pm-law/shorts.json             # data/bills/pm-law/shorts.mp4 + poster.jpg
 python3 shorts/render.py data/bills/<id>/shorts.json --out /원하는/폴더   # 저장 위치 변경
