@@ -127,11 +127,57 @@ h2{margin:0;font-size:17px}
 #toast{position:absolute;left:16px;right:16px;top:12px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;transform:translateY(calc(-100% - 40px));visibility:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:9}
 #toast.on{transform:none;visibility:visible}
 @media(prefers-reduced-motion:reduce){#toast,.sw,.sw::after{transition:none}}
+.tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.tabs[hidden]{display:none!important}
+.onb{display:flex;flex-direction:column;gap:22px;min-height:100%}
+.link-btn{display:flex;align-items:center;justify-content:center;width:100%;height:44px;margin-top:4px;border:0;background:transparent;color:var(--mut);font-size:14px;font-weight:500}
+.feat{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:500}
+.fi{width:40px;height:40px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;flex:none}
+.push{display:flex;gap:12px;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 24px rgba(22,24,29,.08)}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:14px 16px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+.opt b{font-size:16px;font-weight:600}
+.opt .ring{width:22px;height:22px;border-radius:11px;border:2px solid #C9C6BD;flex:none;box-sizing:border-box}
+.opt[aria-checked=true]{border:2px solid var(--acc);padding:13px 15px}.opt[aria-checked=true] .ring{border:7px solid var(--acc)}
+.term{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;text-decoration:underline dotted var(--acc) 2px;text-underline-offset:4px;cursor:pointer}
+.term:hover{color:var(--acc)}
+.hint{display:flex;align-items:center;gap:6px;margin:10px 0 0!important;font-size:12px!important;color:var(--mut)!important}
+.tipcard{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;color:var(--ink)}
+.tipcard b{font-size:16px}
+.search{display:flex;align-items:center;gap:8px;height:48px;padding:0 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--mut)}
+.search:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.search input{flex:1;border:0;outline:0;background:transparent;font:inherit;font-size:16px;color:var(--ink);height:100%}
+.flowbox{background:var(--acc-soft);border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px}
+.flow{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.fstep{flex:none;display:flex;align-items:center;gap:6px;height:40px;padding:0 12px 0 6px;border-radius:20px;border:0;background:#fff;font-size:13px;font-weight:600;color:var(--ink)}
+.fstep span{width:26px;height:26px;border-radius:13px;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:12px}
+.arr{color:var(--acc);font-weight:700;flex:none}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;scroll-margin:20px}
+.tcard h3{margin:0;font-size:18px;letter-spacing:-.3px}
+.tcard.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--acc)}100%{box-shadow:0 0 0 0 transparent}}
+.exlink{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:600;min-height:32px}
+.seg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#ECEAE4;border-radius:12px;padding:4px}
+.seg3 button{height:42px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:14px;font-weight:500}
+.seg3 button[aria-selected=true]{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{aspect-ratio:9/16;border-radius:14px;border:0;background:#23252B center/cover;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:12px;color:#fff;font-size:14px;font-weight:600;text-align:left}
+.tile::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+.tile span{position:relative;z-index:1}
+.rowbtn{border:0;background:transparent;padding:0;text-align:left;color:var(--ink);width:100%}
+.mini{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;color:var(--mut);flex:none}
+.on-chip{height:36px;display:inline-flex;align-items:center;background:var(--acc-soft);border-color:transparent;color:var(--acc);font-weight:600;font-size:14px}
+.scrim{position:absolute;inset:0;background:rgba(14,15,18,.4);z-index:20;display:none;align-items:flex-end}
+.scrim.on{display:flex}
+.sheet{background:#fff;width:100%;border-radius:22px 22px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.12);animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+@media(prefers-reduced-motion:reduce){.sheet,.tcard.flash{animation:none}}
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <div id="toast" role="status" aria-live="polite"></div>
+  <div class="scrim" id="scrim" aria-hidden="true"><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div></div>
   <main id="view"></main>
   <nav class="tabs" id="tabs" aria-label="하단 메뉴"></nav>
 </div>
@@ -181,29 +227,82 @@ const NOTIS = [
   {id:'n6', bill:'pm', date:'11.11', text:'PM법 — 국토위 교통소위에서 다시 심사했어요. 1분 쇼츠로 정리했어요.'},
   {id:'n2', bill:'tsg', date:'11.11', text:'건보공단 특사경법 — 법사위 법안심사소위를 통과했어요.'}
 ];
+const TERM_CATS = ['발의 단계','위원회 심사','본회의와 그 이후','법안의 상태','알아두면 좋은 말'];
+const TERMS = [
+  {t:'발의', c:0, d:'국회의원이 법률안을 국회에 내는 것이에요. 의원 10명 이상이 찬성해야 낼 수 있어요. 정부가 내는 경우는 "제출"이라고 해요.', law:'국회법 제79조'},
+  {t:'대표발의', c:0, d:'법안을 앞장서서 낸 의원이에요. 뉴스에서 "OOO 의원 대표발의"처럼 법안 앞에 붙어요.'},
+  {t:'공동발의', c:0, d:'대표발의 의원과 함께 법안에 이름을 올린 의원들이에요.'},
+  {t:'제정안', a:['제정법률안'], c:0, d:'세상에 없던 법을 새로 만드는 법안이에요. 법 이름 끝이 "법안"으로 끝나면 대개 제정안이에요. 예: 고령자돌봄주택 특별법안', ex:'eldercare'},
+  {t:'개정안', a:['일부개정법률안','전부개정법률안'], c:0, d:'이미 있는 법을 고치는 법안이에요. 일부 조항만 고치면 일부개정, 법 전체를 새로 쓰면 전부개정이에요.', ex:'otc'},
+  {t:'입법예고', c:0, d:'법안 내용을 미리 공개해 국민 의견을 받는 절차예요. 국회 입법예고 사이트에서 누구나 의견을 남길 수 있어요.'},
+  {t:'의안번호', c:0, d:'국회에 접수된 법안마다 붙는 고유 번호예요. 국회 의안정보시스템에서 이 번호로 진행 상황을 찾을 수 있어요.'},
+  {t:'상임위원회', a:['상임위'], c:1, d:'분야별로 법안을 먼저 심사하는 국회의 위원회예요. 보건복지위원회, 국토교통위원회처럼 나뉘어 있어요.'},
+  {t:'소관 상임위', a:['소관위원회','소관위'], c:1, d:'그 법안의 분야를 맡은 상임위예요. 약사법은 보건복지위원회, 킥보드 법은 국토교통위원회가 맡아요.', ex:'otc'},
+  {t:'회부', c:1, d:'국회의장이 접수된 법안을 소관 상임위로 보내는 것이에요. 이때부터 본격적인 심사가 시작돼요.'},
+  {t:'법안심사소위원회', a:['법안소위','소위'], c:1, d:'상임위 안의 작은 위원회예요. 의원 몇 명이 조문을 하나하나 자세히 따져요. 법안이 이 단계에서 오래 머무는 경우가 많아요.', ex:'otc'},
+  {t:'전체회의', c:1, d:'상임위 소속 의원 전원이 모이는 회의예요. 소위에서 넘어온 법안을 의결해서 다음 단계로 보내요.', ex:'tsg'},
+  {t:'검토보고서', c:1, d:'상임위 전문위원이 법안의 효과와 문제점을 분석한 보고서예요. 의원들이 심사할 때 기초 자료로 써요.', ex:'otc'},
+  {t:'법제사법위원회', a:['법사위'], c:1, d:'다른 상임위를 통과한 법안을 본회의 전에 한 번 더 살펴보는 위원회예요. 법무와 사법 분야 법안은 직접 맡아 심사하기도 해요.', ex:'tsg'},
+  {t:'체계·자구 심사', a:['체계자구'], c:1, d:'법사위가 법안이 헌법이나 다른 법과 부딪히지 않는지(체계), 용어와 문장이 정확한지(자구)를 검토하는 것이에요.', law:'국회법 제86조'},
+  {t:'병합 심사', a:['병합'], c:1, d:'같은 법을 고치려는 비슷한 법안 여러 건을 한데 묶어 함께 심사하는 것이에요.', ex:'tsg'},
+  {t:'위원회 대안', a:['대안'], c:1, d:'병합 심사한 법안들의 내용을 합쳐 위원회가 새로 만든 법안이에요. 원래 법안들은 "대안반영폐기"로 처리돼요.', ex:'pm'},
+  {t:'대안반영폐기', c:1, d:'법안 내용이 위원회 대안에 담겨서 원래 법안은 폐기로 처리되는 것이에요. 사라진 게 아니라 대안에 합쳐진 거예요.'},
+  {t:'본회의', c:2, d:'국회의원 전체가 모이는 회의예요. 법안을 최종 표결하는 곳이에요.'},
+  {t:'상정', c:2, d:'회의 안건으로 올리는 것이에요. "본회의 상정"은 본회의에서 다룰 안건이 됐다는 뜻이에요.'},
+  {t:'가결', c:2, d:'표결에서 통과되는 것이에요. 본회의는 재적 의원 과반수가 출석하고, 출석 의원 과반수가 찬성하면 가결돼요.', law:'헌법 제49조'},
+  {t:'부결', c:2, d:'표결에서 통과되지 못하는 것이에요.'},
+  {t:'정부 이송', a:['이송'], c:2, d:'본회의를 통과한 법률을 정부로 보내는 것이에요.'},
+  {t:'공포', c:2, d:'대통령이 법률을 국민에게 알리는 것이에요. 정부로 넘어온 날부터 15일 안에 공포해요.', law:'헌법 제53조'},
+  {t:'재의요구', a:['거부권'], c:2, d:'대통령이 국회를 통과한 법률을 다시 논의하라고 국회로 돌려보내는 것이에요. 국회가 재적 과반수 출석, 출석 3분의 2 이상 찬성으로 다시 의결하면 법률로 확정돼요.', law:'헌법 제53조'},
+  {t:'시행', a:['시행일'], c:2, d:'법이 실제로 효력을 갖는 것이에요. 따로 정하지 않으면 공포하고 20일이 지나면 시행돼요. "공포 6개월 뒤 시행"처럼 날짜를 정하는 경우가 많아요.', law:'헌법 제53조', ex:'otc'},
+  {t:'시행령', c:2, d:'법률이 맡긴 세부 내용을 정부가 대통령령으로 정한 규칙이에요. 법보다 바꾸기 쉬워요.', ex:'otc'},
+  {t:'계류', c:3, d:'법안이 처리되지 않고 위원회 등에 머물러 있는 상태예요.', ex:'eldercare'},
+  {t:'보류', c:3, d:'의결을 다음으로 미룬 상태예요. 나중에 다시 심사할 수 있어요.', ex:'tsg'},
+  {t:'임기만료폐기', a:['폐기'], c:3, d:'국회의원 임기(4년)가 끝날 때까지 처리되지 못한 법안이 자동으로 없어지는 것이에요. 다음 국회에서 다시 발의해야 해요.', ex:'tsg'},
+  {t:'철회', c:3, d:'발의한 의원이 법안을 스스로 거둬들이는 것이에요.'},
+  {t:'신속처리안건', a:['패스트트랙'], c:4, d:'재적 의원 5분의 3 이상이 찬성하면 지정되는 제도예요. 정해진 기간(상임위 180일, 법사위 90일)이 지나면 자동으로 다음 단계로 넘어가요.', law:'국회법 제85조의2'},
+  {t:'무제한 토론', a:['필리버스터'], c:4, d:'본회의에서 표결을 늦추려고 시간 제한 없이 토론하는 것이에요. 재적 3분의 1 이상이 요구하면 시작하고, 5분의 3 이상이 찬성하면 끝낼 수 있어요.', law:'국회법 제106조의2'},
+  {t:'특별사법경찰', a:['특사경'], c:4, d:'식품, 환경, 의료처럼 전문 분야를 맡은 공무원이나 기관 직원에게 수사 권한을 주는 제도예요.', ex:'tsg'},
+  {t:'정기국회', c:4, d:'매년 9월 1일에 열려 100일 동안 이어지는 국회예요. 다음 해 예산안을 이때 처리해요. 필요할 때 따로 여는 국회는 임시국회라고 해요.', law:'헌법 제47조'}
+];
+const FLOW = [['발의','발의'],['회부','회부'],['소위 심사','법안심사소위원회'],['전체회의','전체회의'],['법사위','법제사법위원회'],['본회의','본회의'],['공포','공포']];
+const termByKey = {};
+TERMS.forEach((x, i) => { x.i = i; termByKey[x.t] = x; (x.a || []).forEach(k => termByKey[k] = x); });
+const TERM_RE = new RegExp('(' + Object.keys(termByKey).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
 const ICON = {
   home:'<path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   shorts:'<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M10 9l5 3-5 3z"/>',
   bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
-  back:'<path d="M15 18l-6-6 6-6"/>', chev:'<path d="M9 18l6-6-6-6"/>', check:'<path d="M5 12l5 5L20 7"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/><path d="M9 8h7M9 12h5"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  back:'<path d="M15 18l-6-6 6-6"/>', chev:'<path d="M9 18l6-6-6-6"/>', check:'<path d="M5 12l5 5L20 7"/>', x:'<path d="M18 6L6 18M6 6l12 12"/>',
   heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',
   save:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
   share:'<path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/>',
+  scale:'<path d="M12 3v18M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>',
   bldg:'<path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6"/>'
 };
 const ic = (n, s=22, extra='') => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${ICON[n]}</svg>`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* 법안 문장 속 용어에 밑줄을 달아 누르면 뜻이 뜨게 (한 화면에 용어마다 한 번) */
+function linkify(str, seen){
+  return esc(str).replace(TERM_RE, m => {
+    const x = termByKey[m]; if (!x || seen.has(x.i)) return m;
+    seen.add(x.i); return `<button class="term" data-term="${x.i}">${m}</button>`;
+  });
+}
 
 /* ---- state (remembered in this browser only) ---- */
 const KEY = 'beopantalk-v1';
-const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox'};
+const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1};
 let S = {...DEF};
 try { S = {...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}')}; } catch(e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
 const bill = id => BILLS.find(b => b.id === id);
 const following = id => S.follow.includes(id);
 const unread = () => NOTIS.filter(n => !S.read.includes(n.id) && following(n.bill)).length;
+let termQuery = '';
 
 /* ---- toast ---- */
 let tt;
@@ -219,18 +318,54 @@ const billCard = b => `<button class="card" data-go="bill-${b.id}">
   <div class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm">${following(b.id) ? '팔로우 중 · ' : ''}${esc(b.when)}</span></div>
   <div class="bt">${esc(b.title)}</div>${bar(b)}
   <div class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span></div></button>`;
+const steps3 = (n, back) => `<div class="row">${back ? `<a class="icon-btn plain" href="#${back}" aria-label="이전 단계" style="margin:-10px 0 -10px -12px;color:var(--ink)">${ic('back')}</a>` : ''}<div class="steps3">${[0,1,2].map(i => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div><span class="mut sm">${n} / 3</span></div>`;
+
+function viewWelcome(){
+  const feat = (i, t) => `<div class="feat"><span class="fi">${ic(i,20)}</span><span>${t}</span></div>`;
+  const tsg = bill('tsg');
+  return `<div class="pad onb">${steps3(1)}
+    <div class="brand"><span class="logo" style="width:36px;height:36px;border-radius:10px">${ic('bldg',20)}</span>법안톡</div>
+    <div><h1 style="font-size:26px">내 삶을 바꾸는 법안,<br>한 단계 나아갈 때마다<br>알려드려요</h1><p class="mut" style="margin:8px 0 0;font-size:15px">국회에서 논의 중인 법안을 쉬운 말과 1분 쇼츠로 정리해 드려요.</p></div>
+    <div class="card" style="box-shadow:0 8px 24px rgba(22,24,29,.06)"><div class="row"><span class="cat">${esc(tsg.cat)}</span><span class="mut sm">방금</span></div>
+      <div class="bt" style="font-size:15px">${esc(tsg.short)}</div>${bar(tsg)}<div class="st"><b>${esc(tsg.status)}</b></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px;flex:1">${feat('bell','발의부터 공포까지, 단계별 진행 알림')}${feat('shorts','어려운 법안도 1분 쇼츠로 쉽게')}${feat('scale','찬성과 반대, 양쪽 근거를 함께')}</div>
+    <div><a class="cta" href="#interests">시작하기</a><button class="link-btn" data-act="skip">먼저 둘러볼게요</button></div></div>`;
+}
+
+function viewInterests(){
+  const n = S.interests.length, edit = S.onboarded;
+  return `<div class="pad onb">
+    ${edit ? `<div class="row" style="justify-content:flex-start;gap:4px"><a class="icon-btn plain" href="#library" aria-label="보관함으로" style="margin-left:-12px;color:var(--ink)">${ic('back')}</a><b style="font-size:17px">관심 분야 편집</b></div>` : steps3(2, 'welcome')}
+    <div><h1 style="font-size:26px">어떤 분야의 법안이<br>궁금하세요?</h1><p class="mut" style="margin:8px 0 0;font-size:15px">고른 분야의 법안 소식과 쇼츠를 먼저 보여드려요. 언제든 바꿀 수 있어요.</p></div>
+    <div class="chips" style="flex:1;align-content:flex-start">${CATS.map(c => `<button class="chip" data-cat="${c}" aria-pressed="${S.interests.includes(c)}">${c}</button>`).join('')}</div>
+    <div><p class="mut sm" style="text-align:center;margin:0 0 10px"><b style="color:var(--ink)">${n}개</b> 선택됨 · 3개 이상 추천</p>
+    <button class="cta" data-act="${edit ? 'saveInterests' : 'toNotify'}" ${n ? '' : 'disabled'}>${edit ? '저장' : '다음'}</button></div></div>`;
+}
+
+function viewNotify(){
+  const opt = (k, t, d) => `<button class="opt" role="radio" aria-checked="${S.mode === k}" data-mode="${k}"><span class="ring"></span><span style="flex:1;text-align:left"><b>${t}</b><span class="mut sm" style="display:block">${d}</span></span></button>`;
+  const prev = S.mode === 'instant' ? '건보공단 특사경법이 법사위 전체회의에 다시 올라왔어요. 1분 쇼츠로 볼까요?' : '어제 관심 법안 2건에 변화가 있었어요. 아침 요약을 확인해 보세요.';
+  return `<div class="pad onb">${steps3(3, 'interests')}
+    <div><h1 style="font-size:26px">법안이 다음 단계로 가면<br>어떻게 알려드릴까요?</h1><p class="mut" style="margin:8px 0 0;font-size:15px">팔로우한 법안과 고른 분야의 소식을 보내드려요. 설정에서 언제든 바꿀 수 있어요.</p></div>
+    <div><div class="push"><span class="logo" style="width:38px;height:38px;border-radius:10px;flex:none">${ic('bldg',20)}</span><span style="flex:1"><span class="row"><b style="font-size:13px">법안톡</b><span class="mut" style="font-size:12px">지금</span></span><span style="font-size:14px;line-height:1.45;display:block">${prev}</span></span></div>
+    <p class="mut" style="font-size:12px;text-align:center;margin:8px 0 0">알림 미리보기</p></div>
+    <div role="radiogroup" aria-label="받는 방식" style="display:flex;flex-direction:column;gap:10px;flex:1">${opt('instant','즉시 알림','단계가 바뀌는 순간 바로 받아요')}${opt('digest','하루 한 번 요약','매일 아침 8시, 하루치 변화를 모아서')}</div>
+    <div><button class="cta" data-act="finish" data-perm="1">${ic('bell',18)}알림 켜고 시작하기</button><button class="link-btn" data-act="finish">나중에 할게요</button></div></div>`;
+}
 
 function viewHome(){
   let list = BILLS;
   if (S.filter === 'follow') list = BILLS.filter(b => following(b.id));
   if (S.filter === 'interest') list = BILLS.filter(b => b.cats.some(c => S.interests.includes(c)));
   const f = (k, l) => `<button class="pill" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`;
+  const tip = TERMS[(new Date().getDate()) % TERMS.length];
   return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18)}</span>법안톡</div>
     <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
     <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식 · 2026.11.26 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
     <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}</div>
     <div class="cards">${list.length ? list.map(billCard).join('') : '<div class="empty">아직 해당하는 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>'}</div>
+    <button class="tipcard" data-term="${tip.i}"><span class="fi">${ic('book',20)}</span><span style="flex:1;text-align:left"><span class="mut" style="font-size:12px;display:block">오늘의 국회 용어</span><b>${esc(tip.t)}</b><span class="sm" style="display:block;color:#2A2D33;margin-top:2px">${esc(tip.d.split('. ')[0].replace(/\.$/,''))}.</span></span>${ic('chev',18)}</button>
     <section style="display:flex;flex-direction:column;gap:8px">
       <div class="row"><h2>관심 분야 쇼츠</h2><a href="#shorts" style="min-height:44px;display:flex;align-items:center;font-size:14px">전체 보기</a></div>
       <div class="thumbs">${BILLS.map(b => b.video
@@ -243,18 +378,21 @@ function viewHome(){
 
 function viewBill(id){
   const b = bill(id); if (!b) return viewHome();
+  const seen = new Set();
+  const stat = linkify(b.status, seen);
+  const sum = b.summary.map(s => '<li>' + linkify(s, seen) + '</li>').join('');
   const tl = STAGES.map((s, i) => {
     const cls = i < b.cur ? 'd' : i === b.cur ? 'n' : 't';
     return `<div class="ts ${cls}"><div class="rail"><span class="k"></span>${i < 5 ? '<span class="ln"></span>' : ''}</div>
-      <div class="tx"><div><b>${s}</b>${b.subs[i] ? `<span class="mut sm">${esc(b.subs[i])}</span>` : ''}</div>${i === b.cur ? `<span class="tag">${b.tag || (b.hold ? '보류' : '진행 중')}</span>` : ''}</div></div>`;
+      <div class="tx"><div><b>${s}</b>${b.subs[i] ? `<span class="mut sm">${linkify(b.subs[i], seen)}</span>` : ''}</div>${i === b.cur ? `<span class="tag">${b.tag || (b.hold ? '보류' : '진행 중')}</span>` : ''}</div></div>`;
   }).join('');
   const f = following(b.id);
   return `<div class="top" style="padding:8px 8px 0"><a class="icon-btn plain" href="#home" aria-label="뒤로" style="color:var(--ink)">${ic('back')}</a>
     <button class="icon-btn plain" data-act="share" aria-label="공유">${ic('share',20)}</button></div>
   <div class="pad" style="padding-top:0;display:flex;flex-direction:column;gap:16px">
     <div style="display:flex;flex-direction:column;gap:8px"><span class="cat" style="align-self:flex-start">${esc(b.cat)}</span>
-      <h1 style="font-size:22px">${esc(b.title)}</h1><p class="mut sm" style="margin:0">현재: <b style="color:var(--now)">${esc(b.status)}</b> · ${esc(b.when)} 업데이트</p></div>
-    <div class="box"><h3>쉬운 요약</h3><ul>${b.summary.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
+      <h1 style="font-size:22px">${esc(b.title)}</h1><p class="mut sm" style="margin:0">현재: <b style="color:var(--now)">${stat}</b> · ${esc(b.when)} 업데이트</p></div>
+    <div class="box"><h3>쉬운 요약</h3><ul>${sum}</ul><p class="hint">${ic('book',14)}밑줄 친 단어를 누르면 뜻을 알려드려요</p></div>
     ${b.pro.length ? `<div class="two"><div class="box side"><h3 class="pro">찬성 측</h3><ul>${b.pro.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
       <div class="box side"><h3 class="con">반대 측</h3><ul>${b.con.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div></div>` : ''}
     <section><h2 style="margin-bottom:10px">진행 단계</h2><div class="tl">${tl}</div></section>
@@ -281,10 +419,57 @@ function viewShorts(){
         <button data-act="save" data-id="${b.id}" aria-pressed="${saved}"><svg width="28" height="28" viewBox="0 0 24 24" fill="${saved ? '#fff' : 'none'}" stroke="#fff" stroke-width="1.8" aria-hidden="true">${ICON.save}</svg>${saved ? '저장됨' : '저장'}</button>
         <button data-act="share" aria-label="공유">${ic('share',28)}공유</button>
       </div>
-      ${b.video ? '' : ''}
       <div class="meta"><button class="linkcard" data-go="bill-${b.id}"><span style="flex:1;min-width:0"><small>${esc(b.cat)} · ${esc(b.status)}</small><strong>${esc(b.title)}</strong></span><b style="font-size:13px;color:var(--acc);white-space:nowrap">법안 보기</b></button></div>
     </section>`;
   }).join('') + '</div>';
+}
+
+function termCard(x){
+  const b = x.ex && bill(x.ex);
+  return `<article class="tcard" id="term-${x.i}"><div class="row" style="align-items:baseline"><h3>${esc(x.t)}</h3><span class="mut" style="font-size:12px">${esc(TERM_CATS[x.c])}</span></div>
+    ${x.a ? `<p class="mut" style="font-size:12px;margin:0">같은 말: ${x.a.map(esc).join(', ')}</p>` : ''}
+    <p style="margin:6px 0 0;font-size:15px;line-height:1.6">${esc(x.d)}</p>
+    ${x.law || b ? `<div class="row" style="margin-top:8px;justify-content:flex-start;gap:12px;flex-wrap:wrap">${x.law ? `<span class="mut" style="font-size:12px">근거: ${esc(x.law)}</span>` : ''}${b ? `<a class="exlink" href="#bill-${b.id}">이 말이 나온 법안: ${esc(b.short)} ${ic('chev',14)}</a>` : ''}</div>` : ''}</article>`;
+}
+function termList(){
+  const q = termQuery.trim();
+  const list = TERMS.filter(x => (S.termCat < 0 || x.c === S.termCat) && (!q || (x.t + (x.a || []).join(' ') + x.d).includes(q)));
+  return list.length ? list.map(termCard).join('') : `<div class="empty">"${esc(q)}"에 맞는 용어가 아직 없어요.</div>`;
+}
+function viewTerms(){
+  const pill = (k, l) => `<button class="pill" data-termcat="${k}" aria-pressed="${S.termCat === k}">${l}</button>`;
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px">
+    <div><h1>용어 쉽게 알기</h1><p class="mut sm" style="margin:4px 0 0">뉴스와 법안에 자주 나오는 국회 용어를 쉬운 말로 풀었어요.</p></div>
+    <label class="search">${ic('search',20)}<input id="q" type="search" placeholder="예: 소위, 계류, 공포" value="${esc(termQuery)}" autocomplete="off" aria-label="용어 검색"></label>
+    <section class="flowbox"><b style="font-size:14px">법안이 법이 되기까지</b>
+      <div class="flow">${FLOW.map(([l, k], i) => `${i ? '<span class="arr" aria-hidden="true">›</span>' : ''}<button class="fstep" data-term="${termByKey[k].i}"><span>${i + 1}</span>${l}</button>`).join('')}</div></section>
+    <div class="pills">${pill(-1,'전체')}${TERM_CATS.map((c, i) => pill(i, c)).join('')}</div>
+    <div id="termlist" style="display:flex;flex-direction:column;gap:10px">${termList()}</div>
+    <p class="mut" style="font-size:12px;margin:0">쉽게 풀어 쓴 설명이에요. 정확한 내용은 함께 적은 법 조항을 확인해 주세요.</p>
+  </div>`;
+}
+
+function viewLibrary(){
+  const tab = (k, l, n) => `<button role="tab" aria-selected="${S.libTab === k}" data-libtab="${k}">${l} ${n}</button>`;
+  const tiles = ids => {
+    const bs = ids.map(bill).filter(Boolean);
+    return bs.length ? `<div class="grid2">${bs.map(b => `<button class="tile" data-go="shorts" data-reel="${b.id}" style="background-image:url(${b.poster || ''})"><span>${esc(b.short)}</span></button>`).join('')}</div>` : null;
+  };
+  let body;
+  if (S.libTab === 'saved') body = tiles(S.saved) || '<div class="empty">쇼츠에서 저장을 누르면 여기에 모여요.<br>나중에 다시 보고 싶은 영상을 담아 두세요.</div>';
+  else if (S.libTab === 'liked') body = (tiles(S.liked) ? '<p class="mut sm" style="margin:0 0 10px">공감한 분야의 쇼츠를 먼저 보여드려요.</p>' + tiles(S.liked) : '<div class="empty">쇼츠에서 공감을 누르면 여기에 모여요.</div>');
+  else {
+    const bs = S.follow.map(bill).filter(Boolean);
+    body = bs.length ? '<div class="cards">' + bs.map(b => `<div class="card" style="gap:8px"><button class="rowbtn" data-go="bill-${b.id}"><span class="cat">${esc(b.cat)}</span><span class="bt" style="display:block;margin-top:8px">${esc(b.title)}</span></button>${bar(b)}
+      <div class="row"><span class="st"><b>${esc(b.status)}</b></span><button class="mini" data-act="follow" data-id="${b.id}">알림 끄기</button></div></div>`).join('') + '</div>'
+      : '<div class="empty">법안 상세에서 "진행 알림 받기"를 누르면<br>여기서 한꺼번에 관리할 수 있어요.</div>';
+  }
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>
+    <div class="seg3" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('follow','팔로우 법안', S.follow.length)}</div>
+    ${body}
+    <section class="box" style="margin-top:6px"><div class="row"><h3 style="margin:0;color:var(--ink);font-size:15px">내 관심 분야</h3><a href="#interests" style="font-size:14px;min-height:44px;display:flex;align-items:center">편집</a></div>
+      <div class="chips" style="gap:8px">${S.interests.length ? S.interests.map(c => `<span class="chip on-chip">${esc(c)}</span>`).join('') : '<span class="mut sm">아직 고른 분야가 없어요</span>'}</div></section>
+  </div>`;
 }
 
 function viewAlerts(){
@@ -310,36 +495,64 @@ function viewAlerts(){
     <div class="seg" role="tablist">${tab('inbox','알림함' + (unread() ? ' ' + unread() : ''))}${tab('settings','설정')}</div>${body}</div>`;
 }
 
-function viewInterests(){
-  const n = S.interests.length;
-  return `<div class="pad" style="display:flex;flex-direction:column;gap:22px;min-height:100%">
-    <div class="row"><div class="steps3"><i class="on"></i><i class="on"></i><i></i></div><span class="mut sm">2 / 3</span></div>
-    <div><h1 style="font-size:26px">어떤 분야의 법안이<br>궁금하세요?</h1><p class="mut" style="margin:8px 0 0;font-size:15px">고른 분야의 법안 소식과 쇼츠를 먼저 보여드려요. 언제든 바꿀 수 있어요.</p></div>
-    <div class="chips" style="flex:1;align-content:flex-start">${CATS.map(c => `<button class="chip" data-cat="${c}" aria-pressed="${S.interests.includes(c)}">${c}</button>`).join('')}</div>
-    <div><p class="mut sm" style="text-align:center;margin:0 0 10px"><b style="color:var(--ink)">${n}개</b> 선택됨 · 3개 이상 추천</p>
-    <button class="cta" data-act="done" ${n ? '' : 'disabled'}>${S.onboarded ? '저장' : '다음'}</button></div></div>`;
+/* ---- term sheet ---- */
+const scrim = document.getElementById('scrim'), sheet = document.getElementById('sheet');
+let lastFocus = null;
+function openTerm(i){
+  const x = TERMS[+i]; if (!x) return;
+  const b = x.ex && location.hash !== '#bill-' + x.ex && bill(x.ex);
+  lastFocus = document.activeElement;
+  sheet.innerHTML = `<div class="grab" aria-hidden="true"></div><div class="row"><span class="mut" style="font-size:12px">${esc(TERM_CATS[x.c])}</span><button class="icon-btn plain" data-close="1" aria-label="닫기" style="margin:-10px -12px -10px 0">${ic('x',20)}</button></div>
+    <h2 id="sheet-title" style="font-size:22px;margin:2px 0 8px">${esc(x.t)}</h2>
+    <p style="margin:0;font-size:16px;line-height:1.65">${esc(x.d)}</p>
+    ${x.law ? `<p class="mut" style="font-size:12px;margin:10px 0 0">근거: ${esc(x.law)}</p>` : ''}
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+      ${b ? `<a class="cta ghost" href="#bill-${b.id}" data-close="1">이 말이 나온 법안: ${esc(b.short)}</a>` : ''}
+      <a class="link-btn" href="#terms" data-close="1" data-jump="${x.i}">용어 사전에서 더 보기</a></div>`;
+  scrim.classList.add('on'); scrim.setAttribute('aria-hidden', 'false');
+  sheet.querySelector('[data-close]').focus();
 }
+function closeTerm(){ scrim.classList.remove('on'); scrim.setAttribute('aria-hidden', 'true'); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+scrim.addEventListener('click', e => {
+  if (e.target === scrim) return closeTerm();
+  const c = e.target.closest('[data-close]'); if (!c) return;
+  if (c.dataset.jump) { jumpTerm = c.dataset.jump; termQuery = ''; S.termCat = -1; save(); }
+  closeTerm();
+  if (c.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && scrim.classList.contains('on')) closeTerm(); });
 
 /* ---- router ---- */
 const app = document.getElementById('app'), view = document.getElementById('view'), tabs = document.getElementById('tabs');
+let keepScroll = false, focusReel = null, jumpTerm = null;
 function route(){
-  let h = location.hash.slice(1) || (S.onboarded ? 'home' : 'interests');
+  let h = location.hash.slice(1) || (S.onboarded ? 'home' : 'welcome');
   let html, tab = h;
+  const onb = ['welcome', 'notify'].includes(h) || (h === 'interests' && !S.onboarded);
   if (h.startsWith('bill-')) { html = viewBill(h.slice(5)); tab = 'home'; }
   else if (h === 'shorts') html = viewShorts();
   else if (h === 'alerts') html = viewAlerts();
-  else if (h === 'interests') html = viewInterests();
+  else if (h === 'terms') html = viewTerms();
+  else if (h === 'library') html = viewLibrary();
+  else if (h === 'welcome') html = viewWelcome();
+  else if (h === 'notify') html = viewNotify();
+  else if (h === 'interests') { html = viewInterests(); tab = 'library'; }
   else { html = viewHome(); tab = 'home'; }
   view.innerHTML = html;
   app.classList.toggle('dark', h === 'shorts');
+  tabs.hidden = onb;
   const t = (k, l, i) => `<a href="#${k}" ${tab === k ? 'aria-current="page"' : ''}>${ic(i)}${l}${k === 'alerts' && unread() ? `<span class="badge">${unread()}</span>` : ''}</a>`;
-  tabs.innerHTML = t('home','홈','home') + t('shorts','쇼츠','shorts') + t('alerts','알림','bell') + t('interests','내 관심','user');
+  tabs.innerHTML = t('home','홈','home') + t('shorts','쇼츠','shorts') + t('terms','용어','book') + t('alerts','알림','bell') + t('library','보관함','save');
   if (h === 'shorts') {
     setupFeed();
     if (focusReel) { const r = document.getElementById('reel-' + focusReel); if (r) r.scrollIntoView({block:'start'}); focusReel = null; }
   }
+  if (h === 'terms' && jumpTerm != null) {
+    const el = document.getElementById('term-' + jumpTerm);
+    if (el) { el.scrollIntoView({block:'center'}); el.classList.add('flash'); }
+    jumpTerm = null;
+  }
 }
-let keepScroll = false, focusReel = null;
 function rerender(){ const y = view.scrollTop; route(); if (keepScroll) view.scrollTop = y; }
 
 /* ---- shorts autoplay ---- */
@@ -354,27 +567,42 @@ function setupFeed(){
 }
 
 /* ---- events ---- */
+view.addEventListener('input', e => {
+  if (e.target.id !== 'q') return;
+  termQuery = e.target.value;
+  const box = document.getElementById('termlist'); if (box) box.innerHTML = termList();
+});
 view.addEventListener('click', e => {
   const el = e.target.closest('button,[data-go]'); if (!el) return;
   const d = el.dataset;
   keepScroll = true;
+  if (d.term) { openTerm(d.term); return; }
   if (d.go) { keepScroll = false; focusReel = d.reel || null; if (location.hash === '#' + d.go) route(); else location.hash = d.go; return; }
   if (d.filter) { S.filter = d.filter; }
+  else if (d.termcat) { S.termCat = +d.termcat; }
+  else if (d.libtab) { S.libTab = d.libtab; }
   else if (d.cat) { S.interests = S.interests.includes(d.cat) ? S.interests.filter(c => c !== d.cat) : [...S.interests, d.cat]; }
   else if (d.stage) { S.stages[+d.stage] = !S.stages[+d.stage]; }
   else if (d.mode) { S.mode = d.mode; }
   else if (d.alerttab) { S.alertTab = d.alerttab; }
   else if (d.noti) { const n = NOTIS.find(x => x.id === d.noti); if (!S.read.includes(n.id)) S.read.push(n.id); save(); keepScroll = false; location.hash = 'bill-' + n.bill; return; }
-  else if (d.act === 'done') { S.onboarded = true; save(); keepScroll = false; toast('관심 분야 ' + S.interests.length + '개를 저장했어요'); location.hash = 'home'; return; }
+  else if (d.act === 'toNotify') { save(); keepScroll = false; location.hash = 'notify'; return; }
+  else if (d.act === 'saveInterests') { save(); keepScroll = false; toast('관심 분야 ' + S.interests.length + '개를 저장했어요'); location.hash = 'library'; return; }
+  else if (d.act === 'skip' || d.act === 'finish') {
+    S.onboarded = true; save(); keepScroll = false;
+    if (d.perm) {
+      toast('알림을 켰어요. 단계가 바뀌면 바로 알려드릴게요');
+      try { if ('Notification' in window) Notification.requestPermission().catch(() => {}); } catch(err) {}
+    }
+    location.hash = 'home'; return;
+  }
   else if (d.act === 'follow') { const on = following(d.id); S.follow = on ? S.follow.filter(x => x !== d.id) : [...S.follow, d.id]; toast(on ? '알림을 껐어요' : '단계가 바뀌면 바로 알려드릴게요'); }
   else if (d.act === 'shortsAlert') { S.shortsAlert = !S.shortsAlert; }
   else if (d.act === 'like' || d.act === 'save') {
     const k = d.act === 'like' ? 'liked' : 'saved', on = S[k].includes(d.id);
     S[k] = on ? S[k].filter(x => x !== d.id) : [...S[k], d.id]; save();
-    const v = el.closest('.reel').querySelector('video'), t = v ? v.currentTime : 0;
-    // update just this button without reloading the video
     if (k === 'liked') { const svg = el.querySelector('svg'); svg.setAttribute('fill', on ? 'none' : '#F0536B'); svg.setAttribute('stroke', on ? '#fff' : '#F0536B'); }
-    else { el.querySelector('svg').setAttribute('fill', on ? 'none' : '#fff'); el.lastChild.textContent = on ? '저장' : '저장됨'; toast(on ? '저장을 취소했어요' : '저장한 쇼츠에 담았어요'); }
+    else { el.querySelector('svg').setAttribute('fill', on ? 'none' : '#fff'); el.lastChild.textContent = on ? '저장' : '저장됨'; toast(on ? '저장을 취소했어요' : '보관함에 저장했어요'); }
     el.setAttribute('aria-pressed', !on); return;
   }
   else if (d.act === 'playpause') { const v = el.parentNode.querySelector('video'); v.paused ? v.play().catch(() => {}) : v.pause(); return; }
@@ -394,9 +622,10 @@ view.addEventListener('click', e => {
   else return;
   save(); rerender();
 });
-window.addEventListener('hashchange', () => { keepScroll = false; route(); view.scrollTop = 0; });
+window.addEventListener('hashchange', () => { keepScroll = false; closeTerm(); const j = jumpTerm; route(); if (j == null) view.scrollTop = 0; });
 route();
 }
+
 </script>
 </body>
 </html>
