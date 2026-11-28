@@ -186,6 +186,9 @@ h2{margin:0;font-size:17px}
 .reqbox b{color:var(--ink);font-size:15px}
 .making-box{border-color:transparent;background:#FDEBDD;color:var(--now)}
 .making-box .sm{color:#7A3A12}
+.more{height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:600;color:var(--ink)}
+.has-v{display:inline-flex;align-items:center;gap:3px;margin-left:auto;font-size:12px;font-weight:600;color:var(--ink);background:#EFEDE7;padding:2px 8px;border-radius:10px}
+.mut.soon{color:var(--now);font-weight:600}
 </style>
 </head>
 <body>
@@ -347,7 +350,7 @@ const SYN = {
 };
 const SUGGEST = ['전세','킥보드','최저임금','개인정보','상비약','육아휴직','반려견','딥페이크'];
 const STAGE9 = {1:0,2:1,3:2,4:2,5:3,6:3,7:5,8:5,9:5};
-let DATA = {loaded:false, list:[]};
+let DATA = {loaded:false, list:[], pop:{}};
 const norm = s => String(s || '').replace(/\s+/g, '');
 const catsOf = name => Object.keys(KW).filter(c => KW[c].some(k => name.includes(k)));
 const shortName = n => n.replace(/\s*일부개정법률안$/, ' 개정안').replace(/\s*전부개정법률안$/, ' 전부개정안').replace(/법률안$/, '법안');
@@ -373,16 +376,18 @@ function miniBill(r, d){
 }
 async function loadData(){
   const get = async f => { try { const r = await fetch(f, {cache:'no-cache'}); return r.ok ? await r.json() : []; } catch(e) { return []; } };
-  const [nb, det] = await Promise.all([get('data/new_bills.json'), get('data/bills.json')]);
+  const [nb, det, pop] = await Promise.all([get('data/new_bills.json'), get('data/bills.json'), get('data/popular.json')]);
   const byId = {};
   (Array.isArray(det) ? det : []).forEach(d => byId[d.bill_id] = d);
   const seen = new Set(), list = [];
   (Array.isArray(nb) ? nb : []).forEach(r => { if (r && r.bill_id && !seen.has(r.bill_id)) { seen.add(r.bill_id); list.push(miniBill(r, byId[r.bill_id])); } });
   Object.values(byId).forEach(d => { if (!seen.has(d.bill_id)) { seen.add(d.bill_id); list.push(miniBill(d, d)); } });
   list.sort((a, b) => b.proposeDate.localeCompare(a.proposeDate));
-  DATA = {loaded:true, list};
+  const popMap = {};
+  (Array.isArray(pop) ? pop : []).forEach(p => { if (p && p.id) popMap[String(p.id)] = p; });
+  DATA = {loaded:true, list, pop:popMap};
   const h = location.hash.slice(1);
-  if (h === 'search' || h === 'library' || h === 'alerts' || /^bill-\d/.test(h)) rerender();
+  if (!h || h === 'home' || h === 'search' || h === 'library' || h === 'alerts' || /^bill-\d/.test(h)) rerender();
 }
 const bill = id => BILLS.find(b => b.id === id) || DATA.list.find(b => b.id === id);
 const requested = id => S.requests.some(r => r.id === id);
@@ -495,19 +500,55 @@ function viewNotify(){
     <div><button class="cta" data-act="finish" data-perm="1">${ic('bell',18)}알림 켜고 시작하기</button><button class="link-btn" data-act="finish">아직 알림을 받지 않을게요</button></div></div>`;
 }
 
+/* 홈 목록: 나한테 중요한 순서로 섞고 5개씩 보여준다 */
+const PAGE = 5;
+let homeLimit = PAGE;
+const popScore = id => { const p = DATA.pop[id]; return p ? (p.likes || 0) + (p.saves || 0) * 2 + (p.requests || 0) * 2 : 0; };
+function homeItems(){
+  const all = [...BILLS, ...DATA.list];
+  const inInt = b => (b.cats || []).some(c => S.interests.includes(c));
+  const byWhen = (x, y) => (y.when || '').localeCompare(x.when || '');
+  if (S.filter === 'popular') return all.filter(b => popScore(b.id) > 0).sort((x, y) => popScore(y.id) - popScore(x.id)).map(b => ({b, why:'pop'}));
+  if (S.filter === 'follow') return all.filter(b => following(b.id)).sort(byWhen).map(b => ({b, why:'팔로우 중'}));
+  if (S.filter === 'interest') return [...BILLS.filter(inInt), ...DATA.list.filter(inInt)].map(b => ({b, why:b.mini ? '새로 발의' : '관심 분야'}));
+  const out = [], seen = new Set();
+  const add = (list, why) => list.forEach(b => { if (!seen.has(b.id)) { seen.add(b.id); out.push({b, why}); } });
+  add(all.filter(b => following(b.id)).sort(byWhen), '팔로우 중');
+  add(all.filter(b => b.cur >= 3 || /통과|대기|상정/.test(b.status)), '곧 결정');
+  add(BILLS.filter(inInt), '관심 분야');
+  add(DATA.list.filter(inInt), '관심 분야 새 법안');
+  add(BILLS, '');
+  add(DATA.list, '새로 발의');
+  return out;
+}
+function homeCard({b, why}){
+  const p = DATA.pop[b.id];
+  const right = why === 'pop' && p ? `공감 ${p.likes || 0} · 저장 ${p.saves || 0}` : [why, b.when].filter(Boolean).join(' · ');
+  return `<button class="card" data-go="bill-${b.id}">
+  <div class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm${why === '곧 결정' ? ' soon' : ''}">${esc(right)}</span></div>
+  <div class="bt">${esc(b.title)}</div>${bar(b)}
+  <div class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span>${b.video ? `<span class="has-v">${ic('shorts',14)}쇼츠</span>` : ''}</div></button>`;
+}
+function homeList(){
+  const items = homeItems(), shown = items.slice(0, homeLimit), left = items.length - shown.length;
+  if (!items.length) {
+    if (S.filter === 'popular') return `<div class="empty"><b style="color:var(--ink)">인기 순위를 모으는 중이에요</b><br>여러 사람이 누른 공감과 저장, 쇼츠 신청 수를 모아 순위를 보여드릴 예정이에요.</div>`;
+    if (S.filter === 'follow') return '<div class="empty">아직 팔로우한 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>';
+    if (S.filter === 'interest') return `<div class="empty">${S.interests.length ? '고른 분야의 법안을 불러오는 중이에요.' : '아직 고른 관심 분야가 없어요.<br><a href="#interests">관심 분야 고르기</a>'}</div>`;
+    return '<div class="empty">법안을 불러오는 중이에요…</div>';
+  }
+  return shown.map(homeCard).join('') + (left > 0 ? `<button class="more" data-act="more">더 보기 <span class="mut">(${left}개 남음)</span></button>` : (items.length > PAGE ? '<p class="mut sm" style="text-align:center;margin:4px 0 0">목록을 모두 봤어요</p>' : ''));
+}
 function viewHome(){
-  let list = BILLS;
-  if (S.filter === 'follow') list = BILLS.filter(b => following(b.id));
-  if (S.filter === 'interest') list = BILLS.filter(b => b.cats.some(c => S.interests.includes(c)));
   const f = (k, l) => `<button class="pill" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`;
   const tip = TERMS[(new Date().getDate()) % TERMS.length];
   return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18)}</span>법안톡</div>
     <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
-    <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식 · 2026.11.26 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
+    <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
     <button class="searchbar" data-go="search">${ic('search',20)}<span>법안 이름이나 생활 단어로 찾기</span></button>
-    <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}</div>
-    <div class="cards">${list.length ? list.map(billCard).join('') : '<div class="empty">아직 해당하는 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>'}</div>
+    <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}${f('popular','인기')}</div>
+    <div class="cards" id="homelist">${homeList()}</div>
     <button class="tipcard" data-term="${tip.i}"><span class="fi">${ic('book',20)}</span><span style="flex:1;text-align:left"><span class="mut" style="font-size:12px;display:block">오늘의 국회 용어</span><b>${esc(tip.t)}</b><span class="sm" style="display:block;color:#2A2D33;margin-top:2px">${esc(tip.d.split('. ')[0].replace(/\.$/,''))}.</span></span>${ic('chev',18)}</button>
     <section style="display:flex;flex-direction:column;gap:8px">
       <div class="row"><h2>관심 분야 쇼츠</h2><a href="#shorts" style="min-height:44px;display:flex;align-items:center;font-size:14px">전체 보기</a></div>
@@ -515,7 +556,7 @@ function viewHome(){
         ? `<button class="thumb" data-go="shorts" data-reel="${b.id}" style="background-image:url(${b.poster})"><span>${esc(b.short)}, 1분 정리</span></button>`
         : `<button class="thumb soon" data-go="shorts"><span>${esc(b.short)}<br>쇼츠 준비 중</span></button>`).join('')}</div>
     </section>
-    <p class="mut sm" style="margin:0">법안 정보는 2026년 11월 보도를 바탕으로 정리한 시연용 데이터예요.</p>
+    <p class="mut sm" style="margin:0">쇼츠가 있는 법안 정보는 2026년 11월 보도를 바탕으로 정리했고, 나머지 법안은 국회 공식 데이터예요.</p>
   </div>`;
 }
 
@@ -742,7 +783,8 @@ view.addEventListener('click', e => {
     if (box) { box.innerHTML = searchResults(); return; }
     rerender(); return;
   }
-  if (d.filter) { S.filter = d.filter; }
+  if (d.act === 'more') { homeLimit += PAGE; const box = document.getElementById('homelist'); if (box) box.innerHTML = homeList(); return; }
+  if (d.filter) { S.filter = d.filter; homeLimit = PAGE; }
   else if (d.termcat) { S.termCat = +d.termcat; }
   else if (d.libtab) { S.libTab = d.libtab; }
   else if (d.cat) { S.interests = S.interests.includes(d.cat) ? S.interests.filter(c => c !== d.cat) : [...S.interests, d.cat]; }
