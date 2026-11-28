@@ -1,0 +1,47 @@
+{
+  "nzmimeepazxkubdpn": [
+    {
+      "head": [
+        {
+          "list_total_count": 1
+        },
+        {
+          "RESULT": {
+            "CODE": "INFO-000",
+            "MESSAGE": "정상 처리되었습니다."
+          }
+        }
+      ]
+    },
+    {
+      "row": [
+        {
+          "BILL_ID": "PRC_4DDDEEE8A8E4440D8E7D15BD5D097E",
+          "BILL_NO": "2223257",
+          "BILL_NAME": "스토킹범죄의 처벌 등에 관한 법률 일부개정법률안",
+          "COMMITTEE": null,
+          "PROPOSE_DT": "2026-11-25",
+          "PROC_RESULT": null,
+          "AGE": "22",
+          "DETAIL_LINK": "http://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_4DDDEEE8A8E4440D8E7D15BD5D097E&ageFrom=22&ageTo=22",
+          "PROPOSER": "남인순의원 등 12인",
+          "MEMBER_LIST": "http://likms.assembly.go.kr/bill/coactorListPopup.do?billId=PRC_4DDDEEE8A8E4440D8E7D15BD5D097E",
+          "LAW_PROC_DT": null,
+          "LAW_PROC_RESULT_CD": null,
+          "RST_MONA_CD": "04T3751T",
+          "LAW_PRESENT_DT": null,
+          "LAW_SUBMIT_DT": null,
+          "CMT_PROC_RESULT_CD": null,
+          "CMT_PROC_DT": null,
+          "CMT_PRESENT_DT": null,
+          "COMMITTEE_DT": null,
+          "PROC_DT": null,
+          "COMMITTEE_ID": null,
+          "PUBL_MONA_CD": "0R68099X,5N65159P,QUR40502,2KM3589W,TZ228122,JG77046J,P8A4624C,HSS7466Y,IUX1829H,C7E79345,GE71932C",
+          "RST_PROPOSER": "남인순",
+          "PUBL_PROPOSER": "이수진,김윤,전진숙,손솔,민병덕,이언주,전종덕,백혜련,김남근,권칠승,용혜인"
+        }
+      ]
+    }
+  ]
+}

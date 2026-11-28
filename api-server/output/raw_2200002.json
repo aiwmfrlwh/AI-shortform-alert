@@ -1,0 +1,47 @@
+{
+  "nzmimeepazxkubdpn": [
+    {
+      "head": [
+        {
+          "list_total_count": 1
+        },
+        {
+          "RESULT": {
+            "CODE": "INFO-000",
+            "MESSAGE": "정상 처리되었습니다."
+          }
+        }
+      ]
+    },
+    {
+      "row": [
+        {
+          "BILL_ID": "PRC_U2L4Z0P5Z3E0I1I0O4I6R4B1D1O7R0",
+          "BILL_NO": "2200002",
+          "BILL_NAME": "국가과학기술 경쟁력 강화를 위한 이공계지원 특별법 일부개정법률안",
+          "COMMITTEE": "과학기술정보방송통신위원회",
+          "PROPOSE_DT": "2024-05-30",
+          "PROC_RESULT": "대안반영폐기",
+          "AGE": "22",
+          "DETAIL_LINK": "http://likms.assembly.go.kr/bill/billDetail.do?billId=PRC_U2L4Z0P5Z3E0I1I0O4I6R4B1D1O7R0&ageFrom=22&ageTo=22",
+          "PROPOSER": "박충권의원 등 10인",
+          "MEMBER_LIST": "http://likms.assembly.go.kr/bill/coactorListPopup.do?billId=PRC_U2L4Z0P5Z3E0I1I0O4I6R4B1D1O7R0",
+          "LAW_PROC_DT": null,
+          "LAW_PROC_RESULT_CD": null,
+          "RST_MONA_CD": "GP21946O",
+          "LAW_PRESENT_DT": null,
+          "LAW_SUBMIT_DT": null,
+          "CMT_PROC_RESULT_CD": "대안반영폐기",
+          "CMT_PROC_DT": "2024-11-11",
+          "CMT_PRESENT_DT": "2024-07-16",
+          "COMMITTEE_DT": "2024-06-11",
+          "PROC_DT": "2024-11-28",
+          "COMMITTEE_ID": "9700479",
+          "PUBL_MONA_CD": "WJL30106,9D939735,E1J8836Y,DWK26447,GDG1847Z,G6W8250J,5K93695T,P0F1530P,MU69217P",
+          "RST_PROPOSER": "박충권",
+          "PUBL_PROPOSER": "조정훈,김성원,김정재,이인선,권성동,박준태,김승수,김태호,유상범"
+        }
+      ]
+    }
+  ]
+}
