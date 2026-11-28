@@ -199,6 +199,9 @@ h2{margin:0;font-size:17px}
 .vbtn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px;border-radius:18px;border:0;background:var(--ink);color:#fff;font-size:13px;font-weight:600}
 .vbtn.req{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
 .vbtn.making{background:#FDEBDD;color:var(--now)}
+.period{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#ECEAE4;border-radius:12px;padding:4px}
+.period button{height:40px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:14px;font-weight:500}
+.period button[aria-checked=true]{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 </style>
 </head>
 <body>
@@ -322,7 +325,7 @@ function linkify(str, seen){
 
 /* ---- state (remembered in this browser only) ---- */
 const KEY = 'beopantalk-v1';
-const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[]};
+const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[], period:'week'};
 let S = {...DEF};
 try { S = {...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}')}; } catch(e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
@@ -361,6 +364,18 @@ const SYN = {
 const SUGGEST = ['전세','킥보드','최저임금','개인정보','상비약','육아휴직','반려견','딥페이크'];
 const STAGE9 = {1:0,2:1,3:2,4:2,5:3,6:3,7:5,8:5,9:5};
 let DATA = {loaded:false, list:[], pop:{}};
+/* 기간 나눠 보기: 새 법안은 발의일, 원래 있던 법안은 진행 단계가 바뀐 날 기준 */
+BILLS.forEach(b => { if (!b.date && b.when) b.date = '2026-' + b.when.replace('.', '-'); });
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+const WEEK_START = (() => { const d = new Date(TODAY + 'T00:00:00Z'); const k = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - k); return d.toISOString().slice(0, 10); })();
+const PERIODS = [['today','오늘'],['week','이번 주'],['month','이번 달'],['all','전체']];
+const inPeriod = b => {
+  const d = b.date || '';
+  if (S.period === 'today') return d === TODAY;
+  if (S.period === 'week') return d >= WEEK_START && d <= TODAY;
+  if (S.period === 'month') return d.slice(0, 7) === TODAY.slice(0, 7) && d <= TODAY;
+  return true;
+};
 const norm = s => String(s || '').replace(/\s+/g, '');
 const catsOf = name => Object.keys(KW).filter(c => KW[c].some(k => name.includes(k)));
 const shortName = n => n.replace(/\s*일부개정법률안$/, ' 개정안').replace(/\s*전부개정법률안$/, ' 전부개정안').replace(/법률안$/, '법안');
@@ -378,6 +393,7 @@ function miniBill(r, d){
     proposer: r.proposer || det.proposer || '', proposeDate: r.propose_date || det.propose_date || '',
     cur, hold:false, tag: ended ? '종료' : (det.status ? '진행 중' : '접수'),
     status: det.status || '발의됨', when: mmdd(det.status_date || r.propose_date || det.propose_date),
+    date: det.status_date || r.propose_date || det.propose_date || '',
     subs: [(r.proposer || det.proposer || '') + ' · ' + (r.propose_date || det.propose_date || ''), det.committee || '', det.status && cur === 2 ? det.status : '', '', '', ''],
     summary: sentences(det.proposal_reason, 2), summaryLabel:'제안 이유 (원문 일부)',
     pro:[], con:[], video:null,
@@ -514,7 +530,8 @@ function viewNotify(){
 const PAGE = 5;
 let homeLimit = PAGE;
 const popScore = id => { const p = DATA.pop[id]; return p ? (p.likes || 0) + (p.saves || 0) * 2 + (p.requests || 0) * 2 : 0; };
-function homeItems(){
+function homeItems(){ return homeItemsAll().filter(x => inPeriod(x.b)); }
+function homeItemsAll(){
   const all = [...BILLS, ...DATA.list];
   const inInt = b => (b.cats || []).some(c => S.interests.includes(c));
   const byWhen = (x, y) => (y.when || '').localeCompare(x.when || '');
@@ -543,9 +560,16 @@ function homeCard({b, why}){
       : `<button class="vbtn req" data-act="request" data-id="${b.id}">${ic('shorts',15)}쇼츠 신청하기</button>`}
     <button class="fbtn" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${f ? ic('check',15) + '팔로우 중' : ic('bell',15) + '팔로우'}</button></div></div>`;
 }
+function homeCount(){
+  const n = homeItems().length, pl = (PERIODS.find(p => p[0] === S.period) || [])[1];
+  const range = S.period === 'week' ? ` (${WEEK_START.slice(5).replace('-', '.')}~${TODAY.slice(5).replace('-', '.')})` : '';
+  return DATA.loaded ? `${pl}${range} · ${n}건` : '불러오는 중이에요…';
+}
 function homeList(){
   const items = homeItems(), shown = items.slice(0, homeLimit), left = items.length - shown.length;
   if (!items.length) {
+    const pl = (PERIODS.find(p => p[0] === S.period) || [])[1];
+    if (S.period !== 'all' && homeItemsAll().length) return `<div class="empty">${pl}에는 아직 새 소식이 없어요.<br><button class="link-btn" style="height:44px;color:var(--acc);font-weight:600" data-period="${S.period === 'today' ? 'week' : 'all'}">${S.period === 'today' ? '이번 주 소식 보기' : '전체 보기'}</button></div>`;
     if (S.filter === 'popular') return `<div class="empty"><b style="color:var(--ink)">인기 순위를 모으는 중이에요</b><br>여러 사람이 누른 공감과 저장, 쇼츠 신청 수를 모아 순위를 보여드릴 예정이에요.</div>`;
     if (S.filter === 'follow') return '<div class="empty">아직 팔로우한 법안이 없어요.<br>카드의 "팔로우" 버튼을 눌러 보세요.</div>';
     if (S.filter === 'interest') return `<div class="empty">${S.interests.length ? '고른 분야의 법안을 불러오는 중이에요.' : '아직 고른 관심 분야가 없어요.<br><a href="#interests">관심 분야 고르기</a>'}</div>`;
@@ -559,9 +583,11 @@ function viewHome(){
   return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18)}</span>법안톡</div>
     <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
-    <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
+    <div><p class="mut sm" style="margin:0 0 2px">입법 소식 · ${TODAY.slice(5).replace('-', '.')} 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
     <button class="searchbar" data-go="search">${ic('search',20)}<span>법안 이름이나 생활 단어로 찾기</span></button>
+    <div class="period" role="radiogroup" aria-label="기간">${PERIODS.map(([k, l]) => `<button role="radio" aria-checked="${S.period === k}" data-period="${k}">${l}</button>`).join('')}</div>
     <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}${f('popular','인기')}</div>
+    <p class="mut sm" style="margin:-6px 0 0" id="homecount">${homeCount()}</p>
     <div class="cards" id="homelist">${homeList()}</div>
     <button class="tipcard" data-term="${tip.i}"><span class="fi">${ic('book',20)}</span><span style="flex:1;text-align:left"><span class="mut" style="font-size:12px;display:block">오늘의 국회 용어</span><b>${esc(tip.t)}</b><span class="sm" style="display:block;color:#2A2D33;margin-top:2px">${esc(tip.d.split('. ')[0].replace(/\.$/,''))}.</span></span>${ic('chev',18)}</button>
     <section style="display:flex;flex-direction:column;gap:8px">
@@ -798,7 +824,8 @@ view.addEventListener('click', e => {
     rerender(); return;
   }
   if (d.act === 'more') { homeLimit += PAGE; const box = document.getElementById('homelist'); if (box) box.innerHTML = homeList(); return; }
-  if (d.filter) { S.filter = d.filter; homeLimit = PAGE; }
+  if (d.period) { S.period = d.period; homeLimit = PAGE; }
+  else if (d.filter) { S.filter = d.filter; homeLimit = PAGE; }
   else if (d.termcat) { S.termCat = +d.termcat; }
   else if (d.libtab) { S.libTab = d.libtab; }
   else if (d.cat) { S.interests = S.interests.includes(d.cat) ? S.interests.filter(c => c !== d.cat) : [...S.interests, d.cat]; }
