@@ -22,7 +22,7 @@ DATA = ROOT / "data"
 SITE = ROOT / "_site"
 
 BILL_REQUIRED = ["id", "short", "title", "cat", "cats", "cur", "status", "when", "summary", "pro", "con", "sources"]
-ASSEMBLY_FILES = ["bills.json", "new_bills.json"]
+ASSEMBLY_FILES = ["bills.json", "new_bills.json", "members.json"]
 SCREEN_KEYS = ("category", "hook", "what", "pro", "con", "status", "next")  # shorts/render.py 의 screen_texts 와 같은 범위
 MIDDLE_DOTS = "·ㆍ•‧･"
 

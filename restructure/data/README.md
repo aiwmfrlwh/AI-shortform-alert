@@ -33,6 +33,7 @@
 | `summary`, `pro`, `con` | 문장 목록 | 쉬운 설명, 찬성 근거, 반대 근거 |
 | `notices` | 목록 | 알림 `{"id", "date": "MM.DD", "text"}`. id는 앱 전체에서 겹치지 않게 |
 | `sources` | 목록 | 출처 `{"outlet": 매체, "url": 주소}` |
+| `bill_no` | 문자 (생략 가능) | 국회 의안번호. 적어 두면 법안 상세의 "자세히 보기"에 대표발의, 공동발의 의원과 원문이 붙음 (`assembly/`에 같은 번호가 있을 때) |
 
 `shorts.json`의 출처는 같은 형식에 `title`, `date`가 더 붙습니다(`{"outlet", "title", "url", "date"}`).
 
@@ -57,5 +58,6 @@
 | `bills.json` | 자동 | 추적 법안의 진행 상황. 칸 설명은 `collector/API_사용_가이드.md` 5절 |
 | `new_bills.json` | 자동 | 새로 발의된 법안 (최근이 맨 앞, 최대 500건) |
 | `changes.json` | 자동 | 진행 상황이 바뀐 기록 (최근이 맨 앞) |
+| `members.json` | 자동 | 현직 국회의원 명단 `{"updated", "members": {의원코드: {name, party, district, elect_type, terms, units, committee, committees, homepage}}}`. 하루 한 번, 인증키가 있을 때만 받음. 법안의 `lead_mona`, `co_mona`(의원코드)와 이어 붙여 정당, 지역구를 보여줌 |
 | `raw/<의안번호>.json` | 자동 | API 원본 응답 (확인용) |
 | `exports/bills.csv`, `exports/bills.xlsx` | 자동 | `bills.json`을 엑셀로 보기 위한 사본 (고쳐도 반영되지 않음) |
