@@ -241,6 +241,20 @@ h2{margin:0;font-size:17px}
 .orig{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
 .orig summary{cursor:pointer;font-weight:600;font-size:15px;min-height:28px}
 .orig h4{margin:12px 0 4px;font-size:14px}.orig p{margin:0;font-size:14px;line-height:1.7;white-space:pre-line;color:#2A2D33}
+.nbar{margin-bottom:4px}.nbar .pills{flex-wrap:nowrap}
+.mini:disabled{opacity:.45;cursor:default}
+.mini{display:inline-flex;align-items:center;gap:4px}
+.noti{display:flex;align-items:center;gap:4px;border-bottom:1px solid #EFEDE7;padding:0}
+.nmain{flex:1;display:flex;gap:12px;padding:14px 0;border:0;background:transparent;text-align:left;color:var(--ink)}
+.noti .ic{position:relative}
+.noti.unread .ic{background:#FDEBDD;color:var(--now)}
+.noti.unread p{font-weight:600}
+.noti.read .ic{background:#EFEDE7;color:var(--mut)}
+.noti.read p{color:var(--mut)}
+.udot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:5px;background:var(--now);border:2px solid var(--bg)}
+.nread{width:44px;height:44px;border-radius:22px;border:0;background:transparent;color:var(--mut);display:grid;place-items:center;flex:none}
+.nread:hover{background:#EFEDE7;color:var(--acc)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 </head>
 <body>
@@ -364,12 +378,13 @@ function linkify(str, seen){
 
 /* ---- state (remembered in this browser only) ---- */
 const KEY = 'beopantalk-v1';
-const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[], period:'week', termAsks:[], signupHidden:false};
+const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[], period:'week', termAsks:[], signupHidden:false, cleared:[], unreadOnly:false};
 let S = {...DEF};
 try { S = {...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}')}; } catch(e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
 const following = id => S.follow.includes(id);
-const unread = () => allNotis().filter(n => !S.read.includes(n.id) && following(n.bill)).length;
+const unread = () => allNotis().filter(n => !S.read.includes(n.id) && !S.cleared.includes(n.id) && following(n.bill)).length;
+const badgeNum = () => { const n = unread(); return n > 9 ? '9+' : n; };
 let termQuery = '';
 /* ---- 국회 데이터 (api-server가 2시간마다 갱신한 파일을 배포 때 함께 싣는다) ---- */
 const KW = {
@@ -851,11 +866,19 @@ function viewAlerts(){
   const tab = (k, l) => `<button role="tab" aria-selected="${S.alertTab === k}" data-alerttab="${k}">${l}</button>`;
   let body;
   if (S.alertTab === 'inbox') {
-    const list = allNotis().filter(n => following(n.bill)).sort((a, b) => b.date.localeCompare(a.date));
-    body = list.length ? '<div>' + list.map(n => `<button class="noti ${S.read.includes(n.id) ? '' : 'unread'}" data-noti="${n.id}">
-        <span class="ic" style="color:${S.read.includes(n.id) ? 'var(--acc)' : 'var(--now)'}">${ic('bell',20)}</span>
-        <span style="flex:1"><p>${esc(n.text)}</p><span class="mut sm">${n.date}</span></span></button>`).join('') + '</div>'
-      : '<div class="empty">팔로우한 법안의 알림이 여기에 쌓여요.</div>';
+    const all = allNotis().filter(n => following(n.bill) && !S.cleared.includes(n.id)).sort((a, b) => b.date.localeCompare(a.date));
+    const isRead = n => S.read.includes(n.id);
+    const un = all.filter(n => !isRead(n)).length, readN = all.length - un;
+    const list = S.unreadOnly ? all.filter(n => !isRead(n)) : all;
+    const chip = (v, l) => `<button class="pill" data-unreadonly="${v}" aria-pressed="${S.unreadOnly === v}">${l}</button>`;
+    body = all.length ? `<div class="row nbar"><div class="pills">${chip(false, '전체 ' + all.length)}${chip(true, '안 읽음 ' + un)}</div>
+        <button class="mini" data-act="readAll" ${un ? '' : 'disabled'}>${ic('check',14)}모두 읽음</button></div>` : '';
+    body += list.length ? '<div>' + list.map(n => `<div class="noti ${isRead(n) ? 'read' : 'unread'}">
+        <button class="nmain" data-noti="${n.id}"><span class="ic">${ic('bell',20)}${isRead(n) ? '' : '<i class="udot" aria-hidden="true"></i>'}</span>
+          <span style="flex:1"><p>${isRead(n) ? '' : '<span class="sr">안 읽음, </span>'}${esc(n.text)}</p><span class="mut sm">${n.date}</span></span></button>
+        ${isRead(n) ? '' : `<button class="nread" data-readone="${n.id}" aria-label="읽음으로 표시">${ic('check',18)}</button>`}</div>`).join('') + '</div>'
+      : `<div class="empty">${all.length ? '안 읽은 알림이 없어요. 모두 확인했어요!' : '팔로우한 법안의 알림이 여기에 쌓여요.'}</div>`;
+    if (readN && !S.unreadOnly) body += `<button class="link-btn" data-act="clearRead">읽은 알림 ${readN}개 지우기</button>`;
     body += `<button class="cta ghost" data-act="test" style="margin-top:16px">${ic('bell',18)}테스트 알림 보내기</button>`;
   } else {
     body = `<p class="mut sm" style="margin:0 0 8px">팔로우한 법안이 어느 단계에 오면 알려드릴까요?</p>
@@ -918,7 +941,7 @@ function route(){
   view.innerHTML = html;
   app.classList.toggle('dark', h === 'shorts');
   tabs.hidden = onb;
-  const t = (k, l, i) => `<a href="#${k}" ${tab === k ? 'aria-current="page"' : ''}>${ic(i)}${l}${k === 'alerts' && unread() ? `<span class="badge">${unread()}</span>` : ''}</a>`;
+  const t = (k, l, i) => `<a href="#${k}" ${tab === k ? 'aria-current="page"' : ''}>${ic(i)}${l}${k === 'alerts' && unread() ? `<span class="badge" aria-label="안 읽은 알림 ${unread()}개">${badgeNum()}</span>` : ''}</a>`;
   tabs.innerHTML = t('home','홈','home') + t('shorts','쇼츠','shorts') + t('terms','용어','book') + t('alerts','알림','bell') + t('library','보관함','save');
   if (h === 'shorts') {
     setupFeed();
@@ -957,6 +980,10 @@ view.addEventListener('click', e => {
   if (d.term) { openTerm(d.term); return; }
   if (d.go) { keepScroll = false; focusReel = d.reel || null; if (location.hash === '#' + d.go) route(); else location.hash = d.go; return; }
   if (d.suggest) { searchQuery = d.suggest; const i = document.getElementById('sq'); if (i) i.value = searchQuery; document.getElementById('sres').innerHTML = searchResults(); return; }
+  if (d.act === 'readAll') { allNotis().forEach(n => { if (!S.read.includes(n.id)) S.read.push(n.id); }); save(); toast('알림을 모두 읽음으로 표시했어요'); rerender(); return; }
+  if (d.readone) { if (!S.read.includes(d.readone)) S.read.push(d.readone); save(); rerender(); return; }
+  if (d.act === 'clearRead') { allNotis().forEach(n => { if (S.read.includes(n.id) && !S.cleared.includes(n.id)) S.cleared.push(n.id); }); save(); toast('읽은 알림을 지웠어요'); rerender(); return; }
+  if (d.unreadonly) { S.unreadOnly = d.unreadonly === 'true'; save(); rerender(); return; }
   if (d.billtab) { billTab.tab = d.billtab; rerender(); return; }
   if (d.act === 'termAsk') { const q = termQuery.trim(); if (q && !S.termAsks.includes(q)) S.termAsks.push(q); save(); toast('"' + q + '" 추가 요청을 받았어요'); const box = document.getElementById('termlist'); if (box) box.innerHTML = termList(); return; }
   if (d.act === 'hideSignup') { S.signupHidden = true; save(); rerender(); return; }
