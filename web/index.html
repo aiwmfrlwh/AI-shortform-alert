@@ -202,6 +202,23 @@ h2{margin:0;font-size:17px}
 .period{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#ECEAE4;border-radius:12px;padding:4px}
 .period button{height:40px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:14px;font-weight:500}
 .period button[aria-checked=true]{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.notfound{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.notfound b{font-size:16px}
+.nf-links{display:flex;flex-direction:column;gap:8px}
+.nf-link{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 12px;border-radius:12px;background:#F6F5F1;color:var(--ink)}
+.nf-link>span{flex:1}.nf-link b{font-size:15px}
+.cta:disabled.ghost{opacity:1;cursor:default}
+.keep{background:#EAEEFC;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.keep-top{display:flex;gap:12px;align-items:flex-start}
+.keep-top b{font-size:15px;line-height:1.45}
+.keep-ic{width:36px;height:36px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;flex:none}
+.keep-btns{display:flex;align-items:center;gap:6px}.keep-btns .cta{flex:1}
+.keep-link{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:36px;font-size:14px;font-weight:600}
+.perks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.perks li{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500}
+.perks svg{color:var(--acc);flex:none}
+.sso{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:14px;font-size:16px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.sso.kakao{background:#FEE500;border-color:#FEE500;color:#191600}
 </style>
 </head>
 <body>
@@ -266,7 +283,7 @@ function linkify(str, seen){
 
 /* ---- state (remembered in this browser only) ---- */
 const KEY = 'beopantalk-v1';
-const DEF = {onboarded:false, interests:[], follow:[], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[], period:'week'};
+const DEF = {onboarded:false, interests:[], follow:[], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[], period:'week', termAsks:[], signupHidden:false};
 let S = {...DEF}, stored = {};
 try { stored = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; S = {...DEF, ...stored}; } catch(e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
@@ -574,7 +591,15 @@ function termCard(x){
 function termList(){
   const q = termQuery.trim();
   const list = TERMS.filter(x => (S.termCat < 0 || x.c === S.termCat) && (!q || (x.t + (x.a || []).join(' ') + x.d).includes(q)));
-  return list.length ? list.map(termCard).join('') : `<div class="empty">"${esc(q)}"에 맞는 용어가 아직 없어요.</div>`;
+  if (list.length) return list.map(termCard).join('');
+  const qq = encodeURIComponent(q), asked = S.termAsks.includes(q);
+  return `<div class="notfound"><b>"${esc(q)}"는 아직 사전에 없는 단어예요</b>
+    <p class="mut sm" style="margin:4px 0 12px">아래에서 바로 뜻을 찾아볼 수 있어요. 국회 법안에 자주 나오는 말이면 쉬운 설명을 만들어 사전에 넣어 드릴게요.</p>
+    <div class="nf-links">
+      <a class="nf-link" href="https://stdict.korean.go.kr/search/searchResult.do?searchKeyword=${qq}" target="_blank" rel="noopener">${ic('book',18)}<span><b>표준국어대사전</b><span class="mut sm" style="display:block">국립국어원의 낱말 뜻</span></span>${ic('chev',16)}</a>
+      <a class="nf-link" href="https://terms.naver.com/search.naver?query=${qq}" target="_blank" rel="noopener">${ic('search',18)}<span><b>네이버 지식백과</b><span class="mut sm" style="display:block">용어 해설과 배경 설명</span></span>${ic('chev',16)}</a>
+    </div>
+    <button class="cta ${asked ? 'ghost' : ''}" data-act="termAsk" style="margin-top:12px" ${asked ? 'disabled' : ''}>${asked ? ic('check',18) + '추가 요청을 보냈어요' : '이 단어 사전에 추가 요청하기'}</button></div>`;
 }
 function viewTerms(){
   const pill = (k, l) => `<button class="pill" data-termcat="${k}" aria-pressed="${S.termCat === k}">${l}</button>`;
@@ -589,6 +614,21 @@ function viewTerms(){
   </div>`;
 }
 
+function viewSignup(){
+  const n = S.saved.length + S.liked.length + S.follow.length + S.requests.length;
+  const way = (cls, label, icon) => `<button class="sso ${cls}" data-act="sso">${icon}<span>${label}</span></button>`;
+  return `<div class="pad onb">
+    <div class="row" style="justify-content:flex-start;gap:4px"><a class="icon-btn plain" href="#library" aria-label="보관함으로" style="margin-left:-12px;color:var(--ink)">${ic('back')}</a></div>
+    <div><h1 style="font-size:26px">가입하고<br>내 보관함을 지키세요</h1><p class="mut" style="margin:8px 0 0;font-size:15px">${n ? `지금 보관함에 기록 ${n}개가 있어요. ` : ''}가입하면 브라우저 기록을 지우거나 기기를 바꿔도 그대로 남아요.</p></div>
+    <ul class="perks"><li>${ic('check',18)}폰, 컴퓨터 어디서든 같은 보관함</li><li>${ic('check',18)}저장, 공감, 팔로우, 관심 분야를 그대로 유지</li><li>${ic('check',18)}알림 설정도 기기를 바꿔도 그대로</li></ul>
+    <div style="display:flex;flex-direction:column;gap:10px;flex:1;justify-content:flex-end">
+      ${way('kakao', '카카오로 시작하기', '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.6 2 11c0 2.8 1.9 5.3 4.7 6.7l-1 3.6c-.1.4.3.6.6.4l4.3-2.8c.5.1.9.1 1.4.1 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg>')}
+      ${way('google', 'Google로 시작하기', ic('user',20))}
+      ${way('mail', '이메일로 시작하기', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>')}
+      <p class="mut" style="font-size:12px;text-align:center;margin:4px 0 0">가입 기능은 준비 중이에요. 지금 쌓은 기록은 가입할 때 옮길 수 있게 만들 예정이에요.</p>
+      <a class="link-btn" href="#library">가입하지 않고 계속 쓰기</a>
+    </div></div>`;
+}
 function viewLibrary(){
   const tab = (k, l, n) => `<button role="tab" aria-selected="${S.libTab === k}" data-libtab="${k}">${l} ${n}</button>`;
   const tiles = ids => {
@@ -609,7 +649,13 @@ function viewLibrary(){
       <div class="row"><span class="st"><b>${esc(b.status)}</b></span><button class="mini" data-act="follow" data-id="${b.id}">팔로우 취소</button></div></div>`).join('') + '</div>'
       : '<div class="empty">홈 카드나 법안 상세에서 "팔로우"를 누르면<br>여기서 한꺼번에 관리할 수 있어요.</div>';
   }
-  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>
+  const hasRecords = S.saved.length + S.liked.length + S.follow.length + S.requests.length > 0;
+  const banner = !hasRecords ? '' : S.signupHidden
+    ? `<a class="keep-link" href="#signup">${ic('user',16)}가입하고 보관함 지키기</a>`
+    : `<section class="keep"><div class="keep-top"><span class="keep-ic">${ic('save',20)}</span><span style="flex:1"><b>보관함이 초기화되지 않게 가입을 추천드려요</b>
+        <span class="sm" style="display:block;margin-top:2px;color:#3B4252">지금은 이 브라우저에만 저장돼요. 기록을 지우거나 기기를 바꾸면 사라질 수 있어요.</span></span></div>
+        <div class="keep-btns"><a class="cta" href="#signup" style="height:44px;font-size:15px">가입하기</a><button class="link-btn" data-act="hideSignup" style="margin:0;width:auto;padding:0 16px">나중에 할게요</button></div></section>`;
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>${banner}
     <div class="seg3 seg4" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('req','신청', S.requests.length)}${tab('follow','팔로우', S.follow.length)}</div>
     ${body}
     <section class="box" style="margin-top:6px"><div class="row"><h3 style="margin:0;color:var(--ink);font-size:15px">내 관심 분야</h3><a href="#interests" style="font-size:14px;min-height:44px;display:flex;align-items:center">편집</a></div>
@@ -679,6 +725,7 @@ function route(){
   else if (h === 'alerts') html = viewAlerts();
   else if (h === 'terms') html = viewTerms();
   else if (h === 'search') { html = viewSearch(); tab = 'home'; }
+  else if (h === 'signup') { html = viewSignup(); tab = 'library'; }
   else if (h === 'library') html = viewLibrary();
   else if (h === 'welcome') html = viewWelcome();
   else if (h === 'notify') html = viewNotify();
@@ -726,6 +773,9 @@ view.addEventListener('click', e => {
   if (d.term) { openTerm(d.term); return; }
   if (d.go) { keepScroll = false; focusReel = d.reel || null; if (location.hash === '#' + d.go) route(); else location.hash = d.go; return; }
   if (d.suggest) { searchQuery = d.suggest; const i = document.getElementById('sq'); if (i) i.value = searchQuery; document.getElementById('sres').innerHTML = searchResults(); return; }
+  if (d.act === 'termAsk') { const q = termQuery.trim(); if (q && !S.termAsks.includes(q)) S.termAsks.push(q); save(); toast('"' + q + '" 추가 요청을 받았어요'); const box = document.getElementById('termlist'); if (box) box.innerHTML = termList(); return; }
+  if (d.act === 'hideSignup') { S.signupHidden = true; save(); rerender(); return; }
+  if (d.act === 'sso') { toast('가입 기능은 준비 중이에요. 열리면 알려드릴게요'); return; }
   if (d.act === 'request') {
     if (!requested(d.id)) S.requests.push({id:d.id, at:mmdd(new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10))});
     if (!following(d.id)) S.follow.push(d.id);
