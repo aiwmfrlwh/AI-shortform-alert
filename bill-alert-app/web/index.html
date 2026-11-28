@@ -196,6 +196,9 @@ h2{margin:0;font-size:17px}
 .hfoot .has-v{margin-left:0}
 .fbtn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border-radius:18px;border:1.5px solid var(--acc);background:#fff;color:var(--acc);font-size:13px;font-weight:600}
 .fbtn[aria-pressed=true]{background:var(--acc-soft);border-color:transparent}
+.vbtn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px;border-radius:18px;border:0;background:var(--ink);color:#fff;font-size:13px;font-weight:600}
+.vbtn.req{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.vbtn.making{background:#FDEBDD;color:var(--now)}
 </style>
 </head>
 <body>
@@ -535,7 +538,9 @@ function homeCard({b, why}){
   <span class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm${why === '곧 결정' ? ' soon' : ''}">${esc(right)}</span></span>
   <span class="bt">${esc(b.title)}</span>${bar(b)}
   <span class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span></span></button>
-  <div class="row hfoot">${b.video ? `<span class="has-v">${ic('shorts',14)}쇼츠 있음</span>` : '<span></span>'}
+  <div class="row hfoot">${b.video ? `<button class="vbtn" data-go="shorts" data-reel="${b.id}">${ic('shorts',15)}쇼츠 보기</button>`
+      : requested(b.id) ? `<span class="vbtn making">${ic('shorts',15)}쇼츠 만드는 중</span>`
+      : `<button class="vbtn req" data-act="request" data-id="${b.id}">${ic('shorts',15)}쇼츠 신청하기</button>`}
     <button class="fbtn" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${f ? ic('check',15) + '팔로우 중' : ic('bell',15) + '팔로우'}</button></div></div>`;
 }
 function homeList(){
