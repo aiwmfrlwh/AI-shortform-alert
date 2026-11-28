@@ -34,6 +34,7 @@ OUT = BASE / "output"
 API_URL = "https://open.assembly.go.kr/portal/openapi/nzmimeepazxkubdpn"  # 국회의원 발의법률안
 SUMMARY_URL = "https://open.assembly.go.kr/portal/openapi/BPMBILLSUMMARY"  # 법률안 제안이유 및 주요내용
 SUBCMT_URL = "https://open.assembly.go.kr/portal/openapi/TVBPMCONFINFO"  # 소위 심사정보(법률안)
+MEMBER_URL = "https://open.assembly.go.kr/portal/openapi/nwvrqwxyaytdsfvhu"  # 국회의원 인적사항
 AGE = "22"  # 제22대 국회
 SOURCE_URL = "https://open.assembly.go.kr/portal/openapi/main.do"
 
@@ -166,6 +167,18 @@ def derive_status(r, sub):
     return "발의(접수)", r.get("PROPOSE_DT"), 1
 
 
+def proposer_fields(r):
+    """대표발의 의원, 공동발의 의원 이름과 의원코드(MONA_CD). 의원 정보(members.json)와 이어 붙일 때 쓴다."""
+    split = lambda v: [x.strip() for x in (v or "").split(",") if x.strip()]
+    return {
+        "lead_proposer": r.get("RST_PROPOSER") or "",
+        "lead_mona": r.get("RST_MONA_CD") or "",
+        "co_proposers": split(r.get("PUBL_PROPOSER")),
+        "co_mona": split(r.get("PUBL_MONA_CD")),
+        "member_list_url": (r.get("MEMBER_LIST") or "").replace("http://", "https://"),
+    }
+
+
 def to_record(r, texts, api_status, summary, sub):
     t = texts.get(r["BILL_NO"], {})
     if not sub:  # API에 없으면 data/bill_texts.json 수동 입력값 사용
@@ -203,6 +216,7 @@ def to_record(r, texts, api_status, summary, sub):
         "source_url": SOURCE_URL,
         "last_checked": today(),
         "api_status": api_status,
+        **proposer_fields(r),
     }
 
 
@@ -210,7 +224,7 @@ def save(records):
     OUT.mkdir(exist_ok=True)
     (OUT / "bills.json").write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
     with open(OUT / "bills.csv", "w", newline="", encoding="utf-8-sig") as f:  # 엑셀에서 한글 안 깨지게
-        w = csv.DictWriter(f, fieldnames=COLUMNS)
+        w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")  # 의원 목록 같은 칸은 엑셀 사본에서 뺌
         w.writeheader()
         w.writerows(records)
     try:
@@ -307,10 +321,22 @@ def detect_new_bills(key):
         "proposer": r["PROPOSER"],
         "propose_date": r["PROPOSE_DT"],
         "original_url": r["DETAIL_LINK"].replace("http://", "https://"),
+        "committee": r.get("COMMITTEE") or "",
+        **proposer_fields(r),
     } for r in rows if r["BILL_NO"] not in seen]
-    if not fresh:
+    # 예전에 받은 법안에 의원 정보 칸이 없으면, 이번 응답에 같은 법안이 있을 때 채운다 (API 추가 호출 없음)
+    by_no = {r["BILL_NO"]: r for r in rows}
+    filled = 0
+    for b in known:
+        r = by_no.get(b["bill_id"])
+        if r and "lead_proposer" not in b:
+            b.update({"committee": r.get("COMMITTEE") or "", **proposer_fields(r)})
+            filled += 1
+    if not fresh and not filled:
         print("[새 법안 확인] 새로 발의된 법안 없음")
         return False
+    if filled:
+        print(f"[새 법안 확인] 기존 법안 {filled}건에 발의 의원 정보를 채웠습니다")
     path.write_text(json.dumps((fresh + known)[:500], ensure_ascii=False, indent=2), encoding="utf-8")
     if first_run:
         print(f"[새 법안 확인] 처음 실행이라 최근 법안 {len(fresh)}건으로 기준 목록을 만들었습니다")
@@ -318,6 +344,63 @@ def detect_new_bills(key):
         for b in fresh:
             print(f"[새 법안] {b['bill_id']} {b['bill_name']} ({b['proposer']}, {b['propose_date']})")
     return True
+
+
+def update_members(key):
+    """현직 국회의원 명단(정당, 지역구, 선수, 소속 위원회)을 하루 한 번 받아 members.json 에 저장한다.
+    의원코드(MONA_CD)를 키로 써서, 법안의 대표발의, 공동발의 의원과 이어 붙인다. 인증키가 있어야 전체 명단을 받는다."""
+    path = OUT / "members.json"
+    old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    if old.get("updated") == today():
+        print("[의원 명단] 오늘 이미 받음 - 생략")
+        return
+    if not key:
+        print("[의원 명단] 인증키가 없어 생략 (샘플 모드는 5명까지만 줌)")
+        return
+    rows, page = [], 1
+    try:
+        while page <= 5:
+            params = {"Type": "json", "pIndex": page, "pSize": 300, "KEY": key}
+            req = urllib.request.Request(MEMBER_URL + "?" + urllib.parse.urlencode(params), headers={"User-Agent": "Mozilla/5.0"})
+            CALLS["n"] += 1
+            with urllib.request.urlopen(req, timeout=30) as r:
+                code, msg, got = parse(json.loads(r.read().decode("utf-8")), "nwvrqwxyaytdsfvhu")
+            if code != "INFO-000":
+                print(f"[의원 명단] 결과 없음: {code} {msg}")
+                break
+            rows += got
+            if len(got) < 300:
+                break
+            page += 1
+    except Exception as e:
+        print(f"[의원 명단] 연결 실패: {e} - 이전 명단 유지")
+        return
+    if not rows:
+        return
+    (OUT / "raw_members_sample.json").write_text(json.dumps(rows[:2], ensure_ascii=False, indent=2), encoding="utf-8")
+    members = {}
+    for m in rows:
+        code = m.get("MONA_CD")
+        if not code:
+            continue
+        members[code] = {
+            "name": m.get("HG_NM") or "",
+            "party": m.get("POLY_NM") or "",
+            "district": m.get("ORIG_NM") or "",
+            "elect_type": m.get("ELECT_GBN_NM") or "",
+            "terms": m.get("REELE_GBN_NM") or "",
+            "units": m.get("UNITS") or "",
+            "committee": m.get("CMIT_NM") or "",
+            "committees": m.get("CMITS") or "",
+            "homepage": m.get("HOMEPAGE") or "",
+        }
+    if members == old.get("members"):
+        old["updated"] = today()
+        path.write_text(json.dumps(old, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[의원 명단] 바뀐 것 없음 ({len(members)}명)")
+        return
+    path.write_text(json.dumps({"updated": today(), "source": MEMBER_URL, "members": members}, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[의원 명단] {len(members)}명 저장")
 
 
 def update_bill(no, prev, key, texts, mode):
@@ -351,7 +434,7 @@ def update_bill(no, prev, key, texts, mode):
         sub = {k: prev.get(k, "") for k in SUB_FIELDS} if any(prev.get(k) for k in SUB_FIELDS) else None
 
     rec = to_record(r, texts, f"API 호출 성공 {today()} ({mode})", summary, sub)
-    same = prev and all(prev.get(k) == rec[k] for k in COLUMNS if k not in IGNORE_IN_COMPARE)
+    same = prev and "lead_proposer" in prev and all(prev.get(k) == rec[k] for k in COLUMNS if k not in IGNORE_IN_COMPARE)
     if same:
         print(f"[{no}] 변경 없음 ({rec['status']})")
         return prev  # 날짜 칸도 그대로 두어 파일이 바뀌지 않게 함
@@ -377,6 +460,7 @@ def main():
 
     if not sys.argv[1:]:  # 자동 업데이트(목록 실행)일 때만 새 법안 확인
         detect_new_bills(key)
+        update_members(key)
 
     records = [rec for no in bill_nos if (rec := update_bill(no, previous.get(no), key, texts, mode))]
 

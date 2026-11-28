@@ -34,6 +34,7 @@ jobs:
         run: |
           mkdir -p bill-alert-app/web/data
           cp api-server/output/new_bills.json api-server/output/bills.json bill-alert-app/web/data/
+          if [ -f api-server/output/members.json ]; then cp api-server/output/members.json bill-alert-app/web/data/; fi
       - uses: actions/configure-pages@v5
         with:
           enablement: true
