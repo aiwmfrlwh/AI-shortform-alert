@@ -189,6 +189,13 @@ h2{margin:0;font-size:17px}
 .more{height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:600;color:var(--ink)}
 .has-v{display:inline-flex;align-items:center;gap:3px;margin-left:auto;font-size:12px;font-weight:600;color:var(--ink);background:#EFEDE7;padding:2px 8px;border-radius:10px}
 .mut.soon{color:var(--now);font-weight:600}
+.hc{gap:10px}
+.hmain{display:flex;flex-direction:column;gap:11px;width:100%;border:0;background:transparent;padding:0;text-align:left;color:var(--ink)}
+.hmain .bar{display:grid}
+.hfoot{border-top:1px solid #EFEDE7;padding-top:10px;margin-top:2px}
+.hfoot .has-v{margin-left:0}
+.fbtn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border-radius:18px;border:1.5px solid var(--acc);background:#fff;color:var(--acc);font-size:13px;font-weight:600}
+.fbtn[aria-pressed=true]{background:var(--acc-soft);border-color:transparent}
 </style>
 </head>
 <body>
@@ -522,18 +529,20 @@ function homeItems(){
   return out;
 }
 function homeCard({b, why}){
-  const p = DATA.pop[b.id];
-  const right = why === 'pop' && p ? `공감 ${p.likes || 0} · 저장 ${p.saves || 0}` : [why, b.when].filter(Boolean).join(' · ');
-  return `<button class="card" data-go="bill-${b.id}">
-  <div class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm${why === '곧 결정' ? ' soon' : ''}">${esc(right)}</span></div>
-  <div class="bt">${esc(b.title)}</div>${bar(b)}
-  <div class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span>${b.video ? `<span class="has-v">${ic('shorts',14)}쇼츠</span>` : ''}</div></button>`;
+  const p = DATA.pop[b.id], f = following(b.id);
+  const right = why === 'pop' && p ? `공감 ${p.likes || 0} · 저장 ${p.saves || 0}` : [why === '팔로우 중' ? '' : why, b.when].filter(Boolean).join(' · ');
+  return `<div class="card hc"><button class="hmain" data-go="bill-${b.id}">
+  <span class="row"><span class="cat">${esc(b.cat)}</span><span class="mut sm${why === '곧 결정' ? ' soon' : ''}">${esc(right)}</span></span>
+  <span class="bt">${esc(b.title)}</span>${bar(b)}
+  <span class="st"><b>${esc(b.status)}</b><span class="mut">· ${b.cur+1}/6단계</span></span></button>
+  <div class="row hfoot">${b.video ? `<span class="has-v">${ic('shorts',14)}쇼츠 있음</span>` : '<span></span>'}
+    <button class="fbtn" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${f ? ic('check',15) + '팔로우 중' : ic('bell',15) + '팔로우'}</button></div></div>`;
 }
 function homeList(){
   const items = homeItems(), shown = items.slice(0, homeLimit), left = items.length - shown.length;
   if (!items.length) {
     if (S.filter === 'popular') return `<div class="empty"><b style="color:var(--ink)">인기 순위를 모으는 중이에요</b><br>여러 사람이 누른 공감과 저장, 쇼츠 신청 수를 모아 순위를 보여드릴 예정이에요.</div>`;
-    if (S.filter === 'follow') return '<div class="empty">아직 팔로우한 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>';
+    if (S.filter === 'follow') return '<div class="empty">아직 팔로우한 법안이 없어요.<br>카드의 "팔로우" 버튼을 눌러 보세요.</div>';
     if (S.filter === 'interest') return `<div class="empty">${S.interests.length ? '고른 분야의 법안을 불러오는 중이에요.' : '아직 고른 관심 분야가 없어요.<br><a href="#interests">관심 분야 고르기</a>'}</div>`;
     return '<div class="empty">법안을 불러오는 중이에요…</div>';
   }
@@ -589,7 +598,7 @@ function viewBill(id){
       <span style="flex:1"><b style="display:block;font-size:14px">이 법안 1분 쇼츠로 보기</b><span style="font-size:12px;color:#B8BBC2">44초 · 자막</span></span>${ic('chev',18)}</button>` : ''}
     <p class="src" ${b.sources.length ? '' : 'hidden'}>출처: ${b.sources.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>
   </div>
-  <div class="sticky"><button class="cta ${f ? 'ghost' : ''}" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${ic('bell',18)}${f ? '알림 받는 중' : '이 법안 진행 알림 받기'}</button></div>`;
+  <div class="sticky"><button class="cta ${f ? 'ghost' : ''}" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${f ? ic('check',18) + '팔로우 중 · 알림 받는 중' : ic('bell',18) + '팔로우하고 알림 받기'}</button></div>`;
 }
 
 function viewShorts(){
@@ -655,8 +664,8 @@ function viewLibrary(){
   else {
     const bs = S.follow.map(bill).filter(Boolean);
     body = bs.length ? '<div class="cards">' + bs.map(b => `<div class="card" style="gap:8px"><button class="rowbtn" data-go="bill-${b.id}"><span class="cat">${esc(b.cat)}</span><span class="bt" style="display:block;margin-top:8px">${esc(b.title)}</span></button>${bar(b)}
-      <div class="row"><span class="st"><b>${esc(b.status)}</b></span><button class="mini" data-act="follow" data-id="${b.id}">알림 끄기</button></div></div>`).join('') + '</div>'
-      : '<div class="empty">법안 상세에서 "진행 알림 받기"를 누르면<br>여기서 한꺼번에 관리할 수 있어요.</div>';
+      <div class="row"><span class="st"><b>${esc(b.status)}</b></span><button class="mini" data-act="follow" data-id="${b.id}">팔로우 취소</button></div></div>`).join('') + '</div>'
+      : '<div class="empty">홈 카드나 법안 상세에서 "팔로우"를 누르면<br>여기서 한꺼번에 관리할 수 있어요.</div>';
   }
   return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>
     <div class="seg3 seg4" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('req','신청', S.requests.length)}${tab('follow','팔로우', S.follow.length)}</div>
@@ -803,7 +812,7 @@ view.addEventListener('click', e => {
     }
     location.hash = 'home'; return;
   }
-  else if (d.act === 'follow') { const on = following(d.id); S.follow = on ? S.follow.filter(x => x !== d.id) : [...S.follow, d.id]; toast(on ? '알림을 껐어요' : '단계가 바뀌면 바로 알려드릴게요'); }
+  else if (d.act === 'follow') { const on = following(d.id); S.follow = on ? S.follow.filter(x => x !== d.id) : [...S.follow, d.id]; toast(on ? '팔로우를 취소했어요. 알림도 함께 꺼져요' : '팔로우했어요. 단계가 바뀌면 바로 알려드릴게요'); }
   else if (d.act === 'shortsAlert') { S.shortsAlert = !S.shortsAlert; }
   else if (d.act === 'like' || d.act === 'save') {
     const k = d.act === 'like' ? 'liked' : 'saved', on = S[k].includes(d.id);
