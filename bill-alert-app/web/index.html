@@ -172,6 +172,20 @@ h2{margin:0;font-size:17px}
 .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px}
 @keyframes up{from{transform:translateY(40px);opacity:.4}}
 @media(prefers-reduced-motion:reduce){.sheet,.tcard.flash{animation:none}}
+.searchbar{display:flex;align-items:center;gap:10px;width:100%;height:50px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:15px;text-align:left}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 14px}
+.rmain{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;border:0;background:transparent;padding:0;text-align:left;color:var(--ink)}
+.rt{font-size:15px;font-weight:600;line-height:1.4}
+.rbtn{flex:none;display:inline-flex;align-items:center;gap:4px;height:38px;padding:0 12px;border-radius:19px;border:1.5px solid var(--acc);background:#fff;color:var(--acc);font-size:13px;font-weight:600;white-space:nowrap}
+.rbtn.play{background:var(--ink);border-color:var(--ink);color:#fff}
+.rbtn.making{border-color:transparent;background:#FDEBDD;color:var(--now)}
+.sgroup{display:flex;flex-direction:column;gap:10px}
+.seg4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.reqbox{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1.5px solid var(--acc);border-radius:14px;padding:14px;color:var(--acc)}
+.reqbox b{color:var(--ink);font-size:15px}
+.making-box{border-color:transparent;background:#FDEBDD;color:var(--now)}
+.making-box .sm{color:#7A3A12}
 </style>
 </head>
 <body>
@@ -295,14 +309,142 @@ function linkify(str, seen){
 
 /* ---- state (remembered in this browser only) ---- */
 const KEY = 'beopantalk-v1';
-const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1};
+const DEF = {onboarded:false, interests:['의료·보건','주거·부동산','교통'], follow:['tsg'], stages:[true,false,true,true,true,true], mode:'instant', shortsAlert:true, read:[], liked:[], saved:[], filter:'all', alertTab:'inbox', libTab:'saved', termCat:-1, requests:[]};
 let S = {...DEF};
 try { S = {...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}')}; } catch(e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
-const bill = id => BILLS.find(b => b.id === id);
 const following = id => S.follow.includes(id);
-const unread = () => NOTIS.filter(n => !S.read.includes(n.id) && following(n.bill)).length;
+const unread = () => allNotis().filter(n => !S.read.includes(n.id) && following(n.bill)).length;
 let termQuery = '';
+/* ---- 국회 데이터 (api-server가 2시간마다 갱신한 파일을 배포 때 함께 싣는다) ---- */
+const KW = {
+  '주거·부동산':['주택','임대차','부동산','전세','공공주택','건축','재건축','도시정비','임대'],
+  '노동·일자리':['근로','노동','고용','임금','산업안전','직업','노사'],
+  '교육':['교육','학교','유아','대학','학원','교원'],
+  '복지':['복지','장애인','노인','기초생활','사회보장','돌봄'],
+  '환경·기후':['환경','기후','탄소','대기','폐기물','에너지','자원순환'],
+  '교통':['도로','교통','자동차','철도','항공','이동장치','운수','택시'],
+  '디지털·AI':['정보통신','인공지능','개인정보','전자','데이터','플랫폼','방송통신'],
+  '의료·보건':['의료','약사','보건','건강','감염병','응급','간호','의약품','의사'],
+  '세금·재정':['세법','조세','소득세','법인세','부가가치세','재정','지방세','관세','국가재정'],
+  '청년':['청년'],
+  '육아·가족':['아동','양육','출산','육아','가족','보육','모자','한부모'],
+  '안전·재난':['재난','안전','소방','범죄','피해자','실종'],
+  '문화·예술':['문화','예술','관광','체육','콘텐츠','저작권','스포츠'],
+  '반려동물':['동물'],
+  '국방·외교':['군인','병역','국방','외교','통일','보훈','군사'],
+  '농어업':['농업','농어','수산','축산','농지','어업','농촌']
+};
+/* 생활 단어 → 법안 이름에 쓰이는 단어 */
+const SYN = {
+  '킥보드':['개인형 이동장치','이동장치'], '전동킥보드':['개인형 이동장치'], '전세':['주택임대차','전세사기','임대차'], '월세':['주택임대차','임대차'], '집':['주택'],
+  '상비약':['약사법','안전상비'], '편의점':['약사법','안전상비'], '약국':['약사법'], '사무장병원':['사법경찰','특별사법경찰'], '병원':['의료법','의료'],
+  '최저임금':['최저임금법'], '주52시간':['근로기준법'], '야근':['근로기준법'], '육아휴직':['남녀고용평등','육아휴직'], '출산':['저출산','모자보건','출산'],
+  '학폭':['학교폭력'], '학교폭력':['학교폭력'], '딥페이크':['성폭력범죄','정보통신망'], '개인정보':['개인정보 보호법'], '유출':['개인정보'],
+  '연금':['국민연금','연금'], '담배':['국민건강증진'], '술':['주세','국민건강증진'], '택배':['생활물류'], '배달':['생활물류','플랫폼'],
+  '반려견':['동물보호'], '강아지':['동물보호'], '고양이':['동물보호'], '스토킹':['스토킹범죄'], '보이스피싱':['전기통신금융사기'], '사기':['사기','전기통신금융사기'],
+  '청년':['청년'], '노인':['노인복지','고령자'], '실버':['고령자'], '장애인':['장애인'], '군대':['병역법','군인'], '세금':['세법','소득세','조세']
+};
+const SUGGEST = ['전세','킥보드','최저임금','개인정보','상비약','육아휴직','반려견','딥페이크'];
+const STAGE9 = {1:0,2:1,3:2,4:2,5:3,6:3,7:5,8:5,9:5};
+let DATA = {loaded:false, list:[]};
+const norm = s => String(s || '').replace(/\s+/g, '');
+const catsOf = name => Object.keys(KW).filter(c => KW[c].some(k => name.includes(k)));
+const shortName = n => n.replace(/\s*일부개정법률안$/, ' 개정안').replace(/\s*전부개정법률안$/, ' 전부개정안').replace(/법률안$/, '법안');
+const mmdd = d => d ? d.slice(5).replace('-', '.') : '';
+function sentences(t, n){
+  return String(t || '').replace(/\n/g, ' ').split(/(?<=[함음임됨다]\.)\s+/).map(s => s.trim()).filter(Boolean).slice(0, n);
+}
+function miniBill(r, d){
+  const name = r.bill_name, cats = catsOf(name);
+  const det = d || {};
+  const cur = det.stage_no != null ? (STAGE9[det.stage_no] ?? 0) : 0;
+  const ended = det.stage_no === 0;
+  return {
+    id:r.bill_id, mini:true, cats, cat: cats[0] || '기타', short: shortName(name), title: name,
+    proposer: r.proposer || det.proposer || '', proposeDate: r.propose_date || det.propose_date || '',
+    cur, hold:false, tag: ended ? '종료' : (det.status ? '진행 중' : '접수'),
+    status: det.status || '발의됨', when: mmdd(det.status_date || r.propose_date || det.propose_date),
+    subs: [(r.proposer || det.proposer || '') + ' · ' + (r.propose_date || det.propose_date || ''), det.committee || '', det.status && cur === 2 ? det.status : '', '', '', ''],
+    summary: sentences(det.proposal_reason, 2), summaryLabel:'제안 이유 (원문 일부)',
+    pro:[], con:[], video:null,
+    sources: r.original_url ? [['국회 의안정보시스템', r.original_url]] : []
+  };
+}
+async function loadData(){
+  const get = async f => { try { const r = await fetch(f, {cache:'no-cache'}); return r.ok ? await r.json() : []; } catch(e) { return []; } };
+  const [nb, det] = await Promise.all([get('data/new_bills.json'), get('data/bills.json')]);
+  const byId = {};
+  (Array.isArray(det) ? det : []).forEach(d => byId[d.bill_id] = d);
+  const seen = new Set(), list = [];
+  (Array.isArray(nb) ? nb : []).forEach(r => { if (r && r.bill_id && !seen.has(r.bill_id)) { seen.add(r.bill_id); list.push(miniBill(r, byId[r.bill_id])); } });
+  Object.values(byId).forEach(d => { if (!seen.has(d.bill_id)) { seen.add(d.bill_id); list.push(miniBill(d, d)); } });
+  list.sort((a, b) => b.proposeDate.localeCompare(a.proposeDate));
+  DATA = {loaded:true, list};
+  const h = location.hash.slice(1);
+  if (h === 'search' || h === 'library' || h === 'alerts' || /^bill-\d/.test(h)) rerender();
+}
+const bill = id => BILLS.find(b => b.id === id) || DATA.list.find(b => b.id === id);
+const requested = id => S.requests.some(r => r.id === id);
+const allNotis = () => [...NOTIS, ...S.requests.map(r => {
+  const b = bill(r.id);
+  return {id:'r-' + r.id, bill:r.id, date:r.at, text:(b ? b.short : '신청한 법안') + ' — 쇼츠 신청이 접수됐어요. 다 만들어지면 바로 알려드릴게요.'};
+})];
+
+function searchBills(q){
+  const nq = norm(q); if (!nq) return [];
+  const keys = [nq, ...Object.keys(SYN).filter(k => nq.includes(k)).flatMap(k => SYN[k].map(norm))];
+  const pool = [...BILLS, ...DATA.list];
+  const score = b => {
+    const hay = norm(b.title + ' ' + b.short), who = norm(b.proposer || '');
+    let s = 0;
+    keys.forEach((k, i) => { if (hay.includes(k)) s += i === 0 ? 10 : 6; });
+    if (who.includes(nq)) s += 8;
+    if (!s && (b.cats || []).some(c => norm(c).includes(nq))) s += 3;
+    if (s && b.video) s += 2;
+    return s;
+  };
+  return pool.map(b => [score(b), b]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, 30).map(x => x[1]);
+}
+function resultRow(b){
+  let act;
+  if (b.video) act = `<button class="rbtn play" data-go="shorts" data-reel="${b.id}">${ic('shorts',16)}쇼츠 보기</button>`;
+  else if (requested(b.id)) act = `<span class="rbtn making">만드는 중</span>`;
+  else act = `<button class="rbtn" data-act="request" data-id="${b.id}">쇼츠 신청</button>`;
+  return `<div class="rrow"><button class="rmain" data-go="bill-${b.id}">
+      <span class="row" style="justify-content:flex-start;gap:6px"><span class="cat">${esc(b.cat)}</span><span class="mut" style="font-size:12px">${esc(b.status)}${b.when ? ' · ' + esc(b.when) : ''}</span></span>
+      <span class="rt">${esc(b.title)}</span>${b.proposer ? `<span class="mut" style="font-size:12px">${esc(b.proposer)}</span>` : ''}</button>${act}</div>`;
+}
+function searchResults(){
+  const q = searchQuery.trim();
+  if (!q) return searchHome();
+  const rs = searchBills(q);
+  if (!DATA.loaded) return '<div class="empty">국회 법안 목록을 불러오는 중이에요…</div>';
+  if (!rs.length) return `<div class="empty">"${esc(q)}"에 맞는 법안을 찾지 못했어요.<br>법안 이름의 한 단어나 의원 이름으로도 찾아보세요.</div>`;
+  const syn = Object.keys(SYN).filter(k => norm(q).includes(k));
+  return `${syn.length ? `<p class="mut sm" style="margin:0">"${esc(syn[0])}" 관련 법안 이름(${SYN[syn[0]].map(esc).join(', ')})까지 함께 찾았어요.</p>` : ''}
+    <p class="mut sm" style="margin:0">${rs.length}건 · 영상이 없는 법안은 신청하면 만들어 드려요</p>
+    <div class="rlist">${rs.map(resultRow).join('')}</div>`;
+}
+function searchHome(){
+  const soon = BILLS.filter(b => b.cur >= 3 || /통과|대기|상정/.test(b.status));
+  const mine = DATA.list.filter(b => b.cats.some(c => S.interests.includes(c))).slice(0, 5);
+  const fresh = DATA.list.slice(0, 5);
+  const sec = (t, sub, list) => list.length ? `<section class="sgroup"><div><h2>${t}</h2><p class="mut sm" style="margin:2px 0 0">${sub}</p></div><div class="rlist">${list.map(resultRow).join('')}</div></section>` : '';
+  return `<div class="pills" style="flex-wrap:wrap">${SUGGEST.map(w => `<button class="pill" data-suggest="${w}">${w}</button>`).join('')}</div>
+    ${sec('곧 결정되는 법안', '다음 단계 결정을 앞둔 법안이에요', soon)}
+    ${sec('내 관심 분야의 새 법안', S.interests.length ? S.interests.slice(0, 3).join(', ') + (S.interests.length > 3 ? ' 외' : '') + ' 분야에서 최근 발의됐어요' : '관심 분야를 고르면 여기에 모여요', mine)}
+    ${sec('최근 발의된 법안', DATA.loaded ? '국회에 새로 들어온 법안이에요' : '불러오는 중이에요…', fresh)}`;
+}
+function viewSearch(){
+  return `<div class="pad" style="display:flex;flex-direction:column;gap:14px">
+    <div class="row" style="justify-content:flex-start;gap:4px"><a class="icon-btn plain" href="#home" aria-label="뒤로" style="margin-left:-12px;color:var(--ink)">${ic('back')}</a><h1 style="font-size:22px">법안 찾기</h1></div>
+    <label class="search">${ic('search',20)}<input id="sq" type="search" placeholder="예: 전세, 킥보드, 의원 이름" value="${esc(searchQuery)}" autocomplete="off" enterkeyhint="search" aria-label="법안 검색"></label>
+    <div id="sres" style="display:flex;flex-direction:column;gap:12px">${searchResults()}</div>
+  </div>`;
+}
+let searchQuery = '';
+
 
 /* ---- toast ---- */
 let tt;
@@ -363,6 +505,7 @@ function viewHome(){
     <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
     <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식 · 2026.11.26 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
+    <button class="searchbar" data-go="search">${ic('search',20)}<span>법안 이름이나 생활 단어로 찾기</span></button>
     <div class="pills">${f('all','전체')}${f('follow','팔로우 법안')}${f('interest','관심 분야')}</div>
     <div class="cards">${list.length ? list.map(billCard).join('') : '<div class="empty">아직 해당하는 법안이 없어요.<br>법안 상세에서 알림 받기를 눌러 팔로우해 보세요.</div>'}</div>
     <button class="tipcard" data-term="${tip.i}"><span class="fi">${ic('book',20)}</span><span style="flex:1;text-align:left"><span class="mut" style="font-size:12px;display:block">오늘의 국회 용어</span><b>${esc(tip.t)}</b><span class="sm" style="display:block;color:#2A2D33;margin-top:2px">${esc(tip.d.split('. ')[0].replace(/\.$/,''))}.</span></span>${ic('chev',18)}</button>
@@ -392,13 +535,18 @@ function viewBill(id){
   <div class="pad" style="padding-top:0;display:flex;flex-direction:column;gap:16px">
     <div style="display:flex;flex-direction:column;gap:8px"><span class="cat" style="align-self:flex-start">${esc(b.cat)}</span>
       <h1 style="font-size:22px">${esc(b.title)}</h1><p class="mut sm" style="margin:0">현재: <b style="color:var(--now)">${stat}</b> · ${esc(b.when)} 업데이트</p></div>
-    <div class="box"><h3>쉬운 요약</h3><ul>${sum}</ul><p class="hint">${ic('book',14)}밑줄 친 단어를 누르면 뜻을 알려드려요</p></div>
+    ${b.proposer ? `<p class="mut sm" style="margin:-8px 0 0">${esc(b.proposer)} · 발의 ${esc(b.proposeDate)}</p>` : ''}
+    ${b.summary.length ? `<div class="box"><h3>${b.summaryLabel || '쉬운 요약'}</h3><ul>${sum}</ul><p class="hint">${ic('book',14)}밑줄 친 단어를 누르면 뜻을 알려드려요</p></div>`
+      : `<div class="box"><h3>쉬운 요약</h3><p>아직 요약이 없어요. 쇼츠를 신청하면 쉬운 요약과 함께 만들어 드려요.</p></div>`}
+    ${!b.video ? (requested(b.id)
+      ? `<div class="reqbox making-box">${ic('shorts',22)}<span style="flex:1"><b>쇼츠 만드는 중</b><span class="sm" style="display:block">다 만들어지면 알림으로 알려드릴게요.</span></span></div>`
+      : `<button class="reqbox" data-act="request" data-id="${b.id}">${ic('shorts',22)}<span style="flex:1;text-align:left"><b>이 법안 1분 쇼츠 신청하기</b><span class="sm mut" style="display:block">신청하면 자동으로 팔로우하고, 완성되면 알려드려요</span></span>${ic('chev',18)}</button>`) : ''}
     ${b.pro.length ? `<div class="two"><div class="box side"><h3 class="pro">찬성 측</h3><ul>${b.pro.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
       <div class="box side"><h3 class="con">반대 측</h3><ul>${b.con.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div></div>` : ''}
     <section><h2 style="margin-bottom:10px">진행 단계</h2><div class="tl">${tl}</div></section>
     ${b.video ? `<button class="watch" data-go="shorts" data-reel="${b.id}"><span style="width:36px;height:36px;border-radius:10px;background:#2E3138;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
       <span style="flex:1"><b style="display:block;font-size:14px">이 법안 1분 쇼츠로 보기</b><span style="font-size:12px;color:#B8BBC2">44초 · 자막</span></span>${ic('chev',18)}</button>` : ''}
-    <p class="src">출처: ${b.sources.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>
+    <p class="src" ${b.sources.length ? '' : 'hidden'}>출처: ${b.sources.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>
   </div>
   <div class="sticky"><button class="cta ${f ? 'ghost' : ''}" data-act="follow" data-id="${b.id}" aria-pressed="${f}">${ic('bell',18)}${f ? '알림 받는 중' : '이 법안 진행 알림 받기'}</button></div>`;
 }
@@ -457,6 +605,11 @@ function viewLibrary(){
   };
   let body;
   if (S.libTab === 'saved') body = tiles(S.saved) || '<div class="empty">쇼츠에서 저장을 누르면 여기에 모여요.<br>나중에 다시 보고 싶은 영상을 담아 두세요.</div>';
+  else if (S.libTab === 'req') {
+    const bs = S.requests.map(r => bill(r.id)).filter(Boolean);
+    body = bs.length ? '<div class="rlist">' + bs.map(resultRow).join('') + '</div><p class="mut sm" style="margin:0">신청한 쇼츠가 완성되면 알림으로 알려드리고, 여기서 바로 볼 수 있어요.</p>'
+      : (S.requests.length && !DATA.loaded ? '<div class="empty">불러오는 중이에요…</div>' : `<div class="empty">영상이 없는 법안도 쇼츠를 신청할 수 있어요.<br><a href="#search">법안 찾기</a>에서 궁금한 법안을 검색해 보세요.</div>`);
+  }
   else if (S.libTab === 'liked') body = (tiles(S.liked) ? '<p class="mut sm" style="margin:0 0 10px">공감한 분야의 쇼츠를 먼저 보여드려요.</p>' + tiles(S.liked) : '<div class="empty">쇼츠에서 공감을 누르면 여기에 모여요.</div>');
   else {
     const bs = S.follow.map(bill).filter(Boolean);
@@ -465,7 +618,7 @@ function viewLibrary(){
       : '<div class="empty">법안 상세에서 "진행 알림 받기"를 누르면<br>여기서 한꺼번에 관리할 수 있어요.</div>';
   }
   return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>
-    <div class="seg3" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('follow','팔로우 법안', S.follow.length)}</div>
+    <div class="seg3 seg4" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('req','신청', S.requests.length)}${tab('follow','팔로우', S.follow.length)}</div>
     ${body}
     <section class="box" style="margin-top:6px"><div class="row"><h3 style="margin:0;color:var(--ink);font-size:15px">내 관심 분야</h3><a href="#interests" style="font-size:14px;min-height:44px;display:flex;align-items:center">편집</a></div>
       <div class="chips" style="gap:8px">${S.interests.length ? S.interests.map(c => `<span class="chip on-chip">${esc(c)}</span>`).join('') : '<span class="mut sm">아직 고른 분야가 없어요</span>'}</div></section>
@@ -476,7 +629,7 @@ function viewAlerts(){
   const tab = (k, l) => `<button role="tab" aria-selected="${S.alertTab === k}" data-alerttab="${k}">${l}</button>`;
   let body;
   if (S.alertTab === 'inbox') {
-    const list = NOTIS.filter(n => following(n.bill)).sort((a, b) => b.date.localeCompare(a.date));
+    const list = allNotis().filter(n => following(n.bill)).sort((a, b) => b.date.localeCompare(a.date));
     body = list.length ? '<div>' + list.map(n => `<button class="noti ${S.read.includes(n.id) ? '' : 'unread'}" data-noti="${n.id}">
         <span class="ic" style="color:${S.read.includes(n.id) ? 'var(--acc)' : 'var(--now)'}">${ic('bell',20)}</span>
         <span style="flex:1"><p>${esc(n.text)}</p><span class="mut sm">${n.date}</span></span></button>`).join('') + '</div>'
@@ -533,6 +686,7 @@ function route(){
   else if (h === 'shorts') html = viewShorts();
   else if (h === 'alerts') html = viewAlerts();
   else if (h === 'terms') html = viewTerms();
+  else if (h === 'search') { html = viewSearch(); tab = 'home'; }
   else if (h === 'library') html = viewLibrary();
   else if (h === 'welcome') html = viewWelcome();
   else if (h === 'notify') html = viewNotify();
@@ -568,6 +722,7 @@ function setupFeed(){
 
 /* ---- events ---- */
 view.addEventListener('input', e => {
+  if (e.target.id === 'sq') { searchQuery = e.target.value; const box = document.getElementById('sres'); if (box) box.innerHTML = searchResults(); return; }
   if (e.target.id !== 'q') return;
   termQuery = e.target.value;
   const box = document.getElementById('termlist'); if (box) box.innerHTML = termList();
@@ -578,6 +733,15 @@ view.addEventListener('click', e => {
   keepScroll = true;
   if (d.term) { openTerm(d.term); return; }
   if (d.go) { keepScroll = false; focusReel = d.reel || null; if (location.hash === '#' + d.go) route(); else location.hash = d.go; return; }
+  if (d.suggest) { searchQuery = d.suggest; const i = document.getElementById('sq'); if (i) i.value = searchQuery; document.getElementById('sres').innerHTML = searchResults(); return; }
+  if (d.act === 'request') {
+    if (!requested(d.id)) S.requests.push({id:d.id, at:mmdd(new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10))});
+    if (!following(d.id)) S.follow.push(d.id);
+    save(); toast('신청했어요. 쇼츠가 완성되면 바로 알려드릴게요');
+    const box = document.getElementById('sres');
+    if (box) { box.innerHTML = searchResults(); return; }
+    rerender(); return;
+  }
   if (d.filter) { S.filter = d.filter; }
   else if (d.termcat) { S.termCat = +d.termcat; }
   else if (d.libtab) { S.libTab = d.libtab; }
@@ -585,7 +749,7 @@ view.addEventListener('click', e => {
   else if (d.stage) { S.stages[+d.stage] = !S.stages[+d.stage]; }
   else if (d.mode) { S.mode = d.mode; }
   else if (d.alerttab) { S.alertTab = d.alerttab; }
-  else if (d.noti) { const n = NOTIS.find(x => x.id === d.noti); if (!S.read.includes(n.id)) S.read.push(n.id); save(); keepScroll = false; location.hash = 'bill-' + n.bill; return; }
+  else if (d.noti) { const n = allNotis().find(x => x.id === d.noti); if (!S.read.includes(n.id)) S.read.push(n.id); save(); keepScroll = false; location.hash = 'bill-' + n.bill; return; }
   else if (d.act === 'toNotify') { save(); keepScroll = false; location.hash = 'notify'; return; }
   else if (d.act === 'saveInterests') { save(); keepScroll = false; toast('관심 분야 ' + S.interests.length + '개를 저장했어요'); location.hash = 'library'; return; }
   else if (d.act === 'skip' || d.act === 'finish') {
@@ -622,8 +786,9 @@ view.addEventListener('click', e => {
   else return;
   save(); rerender();
 });
-window.addEventListener('hashchange', () => { keepScroll = false; closeTerm(); const j = jumpTerm; route(); if (j == null) view.scrollTop = 0; });
+window.addEventListener('hashchange', () => { keepScroll = false; closeTerm(); const j = jumpTerm; route(); if (j == null) view.scrollTop = 0; if (location.hash === '#search') { const i = document.getElementById('sq'); if (i && !searchQuery) i.focus(); } });
 route();
+loadData();
 }
 
 </script>
