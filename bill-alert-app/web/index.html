@@ -33,6 +33,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:19px;letter-spacing:-.3px}
 .logo{width:32px;height:32px;border-radius:9px;background:var(--acc);display:grid;place-items:center}
+.logo svg{stroke:#fff;stroke-width:2}
 .icon-btn{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;position:relative}
 .icon-btn.plain{border:0;background:transparent}
 .dot{position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:5px;background:var(--now);border:2px solid #fff}
@@ -123,8 +124,8 @@ h2{margin:0;font-size:17px}
 .noti .ic{width:40px;height:40px;border-radius:12px;background:var(--acc-soft);display:grid;place-items:center;flex:none}
 .noti.unread .ic{background:#FDEBDD}
 .noti p{margin:0;font-size:14px;line-height:1.5}
-#toast{position:absolute;left:16px;right:16px;top:12px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;transform:translateY(-140%);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:9}
-#toast.on{transform:none}
+#toast{position:absolute;left:16px;right:16px;top:12px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:center;transform:translateY(calc(-100% - 40px));visibility:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:9}
+#toast.on{transform:none;visibility:visible}
 @media(prefers-reduced-motion:reduce){#toast,.sw,.sw::after{transition:none}}
 </style>
 </head>
@@ -224,7 +225,7 @@ function viewHome(){
   if (S.filter === 'follow') list = BILLS.filter(b => following(b.id));
   if (S.filter === 'interest') list = BILLS.filter(b => b.cats.some(c => S.interests.includes(c)));
   const f = (k, l) => `<button class="pill" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`;
-  return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18,'stroke="#fff" stroke-width="2"')}</span>법안톡</div>
+  return `<div class="top"><div class="brand"><span class="logo">${ic('bldg',18)}</span>법안톡</div>
     <a class="icon-btn" href="#alerts" aria-label="알림">${ic('bell',20)}${unread() ? '<span class="dot"></span>' : ''}</a></div>
   <div class="pad" style="padding-top:4px;display:flex;flex-direction:column;gap:18px">
     <div><p class="mut sm" style="margin:0 0 2px">오늘의 입법 소식 · 2026.11.26 기준</p><h1>관심 법안의 진행 상황을<br>한눈에 확인하세요</h1></div>
