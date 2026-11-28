@@ -853,7 +853,7 @@ function viewLibrary(){
     ? `<a class="keep-link" href="#signup">${ic('user',16)}가입하고 보관함 지키기</a>`
     : `<section class="keep"><div class="keep-top"><span class="keep-ic">${ic('save',20)}</span><span style="flex:1"><b>보관함이 초기화되지 않게 가입을 추천드려요</b>
         <span class="sm" style="display:block;margin-top:2px;color:#3B4252">지금은 이 브라우저에만 저장돼요. 기록을 지우거나 기기를 바꾸면 사라질 수 있어요.</span></span></div>
-        <div class="keep-btns"><a class="cta" href="#signup" style="height:44px;font-size:15px">가입하기</a><button class="link-btn" data-act="hideSignup" style="margin:0;width:auto;padding:0 16px">나중에 할게요</button></div></section>`;
+        <div class="keep-btns"><a class="cta" href="#signup" style="height:44px;font-size:15px">법안톡 가입하기</a><button class="link-btn" data-act="hideSignup" style="margin:0;width:auto;padding:0 16px">나중에 할게요</button></div></section>`;
   return `<div class="pad" style="display:flex;flex-direction:column;gap:14px"><h1>보관함</h1>${banner}
     <div class="seg3 seg4" role="tablist">${tab('saved','저장', S.saved.length)}${tab('liked','공감', S.liked.length)}${tab('req','신청', S.requests.length)}${tab('follow','팔로우', S.follow.length)}</div>
     ${body}
