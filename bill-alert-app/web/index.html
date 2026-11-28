@@ -136,7 +136,6 @@ h2{margin:0;font-size:17px}
 </div>
 <script>
 {
-const VIDEO_TSG = 'media/gb-tsg.mp4', POSTER_TSG = 'media/gb-tsg.jpg';
 const STAGES = ['접수·발의','소관위원회 회부','소관위원회 심사','법제사법위원회','본회의 심의','정부 이송·공포'];
 const CATS = ['주거·부동산','노동·일자리','교육','복지','환경·기후','교통','디지털·AI','의료·보건','세금·재정','청년','육아·가족','안전·재난','문화·예술','반려동물','국방·외교','농어업'];
 const BILLS = [
@@ -146,25 +145,39 @@ const BILLS = [
    summary:['건보공단 지정 직원에게 사무장병원·면허대여약국 등 불법 개설 의료기관을 수사할 특별사법경찰 권한을 줘요.','공단 특사경에는 수사종결권이 없어요.','같은 법률의 다른 기관 특사경 개정안과 함께 다시 심사할 예정이에요.'],
    pro:['2009~2025년 적발 사무장병원 1,805곳, 재정 피해 약 2조 9천억 원 (노조 주장)','수사 기간 평균 11개월 → 3개월 단축 기대 (공단 추산)'],
    con:['진료비 지급·환수 기관이 강제수사권까지 가지면 이해충돌 (의협·병협)','법무부도 적법절차 통제장치 필요 의견'],
-   video:true,
+   video:'media/gb-tsg.mp4', poster:'media/gb-tsg.jpg',
    sources:[['코메디닷컴','https://kormedi.com/2906341/'],['팍스메디컬뉴스','https://www.paxmedicalnews.com/news/articleView.html?idxno=3415'],['데일리팜','https://dailypharm.com/user/news/345090'],['서울경제','https://m.sedaily.com/article/20116079']]},
   {id:'eldercare', cats:['주거·부동산','복지'], cat:'주거·복지', short:'고령자돌봄주택 특별법',
-   title:'고령자돌봄주택 특별법안', cur:2, hold:false, status:'소관 상임위 심사 중', when:'11.26',
-   subs:['','소관 상임위원회','상임위 문턱을 넘지 못하고 계류','','',''],
-   summary:['의료·요양 서비스를 결합한 고령자 특화 주택의 공급을 지원하는 법안이에요.','정쟁 여파로 상임위 논의가 멈춰 있다는 보도가 나왔어요.'],
-   pro:[],con:[], video:false,
-   sources:[['서울경제','https://www.sedaily.com/article/20118964']]},
-  {id:'pm', cats:['교통','안전·재난'], cat:'교통·안전', short:'개인형 이동수단 안전관리법',
-   title:'개인형 이동수단 안전관리법안', cur:2, hold:false, status:'소관 상임위 심사 중', when:'11.26',
-   subs:['','소관 상임위원회','상임위 문턱을 넘지 못하고 계류','','',''],
-   summary:['공유 전동킥보드 같은 개인형 이동수단의 안전관리를 강화하는 법안이에요.','상임위 단계에서 논의가 이어지지 못하고 있어요.'],
-   pro:[],con:[], video:false,
-   sources:[['서울경제','https://www.sedaily.com/article/20118964']]}
+   title:'고령자돌봄주택 특별법안', cur:1, hold:false, tag:'계류', status:'상임위 단계에 묶여 있음', when:'11.26',
+   subs:['2025.08.25 여야 의원 24명 공동발의','여야 대치로 상임위 논의 지연','','','',''],
+   summary:['주거에 돌봄과 의료를 묶은 고령자 임대주택을 법으로 만드는 법안이에요.','국토부에 등록한 사업자(자본금 10억 원 이상)가 운영하고, 10년 이상 임대 의무와 표준계약을 둬요.','세제 감면과 주택도시기금 지원도 담겼어요.'],
+   pro:['실버타운과 복지주택 사이, 중산층 노인이 살 집이 없다 (발의 의원, 보험업계)','노인요양시설 이용자 21만 명(2021) → 34만 명(2030) 전망 (보건사회연구원)','30인 이상 요양시설의 땅과 건물 소유 의무를 임차 허용으로 풀어 진입장벽 완화'],
+   con:['비슷한 노인주택만 늘어 혼란이 커진다 (주거 복지 전문가)','방문 돌봄은 집 유형과 무관하고 고령자복지주택 등 기존 제도와 겹친다 (국토연)','중산층 지원은 세제 감면뿐, 건설비 지원이 없다 (전국노인주거복지시설협회)'],
+   video:'media/eldercare.mp4', poster:'media/eldercare.jpg',
+   sources:[['서울경제','https://m.sedaily.com/article/20119002'],['서울경제','https://www.sedaily.com/article/20118964'],['디멘시아뉴스','https://www.dementianews.co.kr/news/articleView.html?idxno=10539'],['브라보마이라이프','https://bravo.etoday.co.kr/view/atc_view/17440']]},
+  {id:'pm', cats:['교통','안전·재난'], cat:'교통·안전', short:'PM법',
+   title:'개인형 이동장치의 안전 및 관리에 관한 법률안 (PM법)', cur:2, hold:false, tag:'계류', status:'국토위 재심사 중', when:'11.11',
+   subs:['2020년부터 추진, 22대 법안 12건 통합','국토교통위원회','2025.12.17 대안 의결 → 2026.1 법사위에서 회수, 11.11 교통소위 재심사','','','공포 1년 뒤 시행 예정'],
+   summary:['전동킥보드 같은 개인형 이동장치(PM)를 따로 관리하는 첫 전용 법이에요.','빌려 탈 때 만 16세 이상과 본인 여부, 안전교육 이수를 확인하고, 공유 킥보드 업체는 자유업에서 등록제로 바뀌어요.','대여 기기 최고속도는 시속 25km에서 20km로 낮아져요.','헌법재판소가 원동기 면허 의무를 합헌으로 본 뒤, 면허 확인 의무를 넣을지 다시 논의 중이에요.'],
+   pro:['킥보드도 도로 위 교통수단이라 면허 확인이 필요하다 (일부 국토위원)','2025.12.18 헌재, 원동기 면허 의무 합헌 결정','2025년 PM 교통사고 1,915건, 23명 사망 (한국도로교통공단)'],
+   con:['원동기 면허는 더 빠르고 무거운 오토바이 기준이라 킥보드와 맞지 않는다 (PM업계, 일부 전문가)','PM 전용 면허나 교육 이수로 대신하자는 대안 (싱가포르는 온라인 교육으로 자격)'],
+   video:'media/pm.mp4', poster:'media/pm.jpg',
+   sources:[['블로터','https://www.bloter.net/news/articleView.html?idxno=678276'],['블로터','https://bloter.net/news/articleView.html?idxno=679446'],['전자신문','https://www.etnews.com/20261109000132'],['이투데이','https://www.etoday.co.kr/news/view/2537036'],['한국경제','https://www.hankyung.com/article/202601091870i'],['플래텀','https://platum.kr/archives/299330']]},
+  {id:'otc', cats:['의료·보건','복지'], cat:'의료·보건', short:'편의점 상비약법',
+   title:'약사법 개정안 (편의점 안전상비약)', cur:2, hold:false, tag:'대기', status:'복지위 법안소위 수정 통과', when:'11.25',
+   subs:['한지아, 이양수 의원 대표발의','보건복지위원회','11.24~25 법안소위 수정 통과, 전체회의 대기','','','공포 6개월 뒤 시행'],
+   summary:['편의점에서 파는 안전상비약 제도를 손보는 법안이에요.','원래는 품목 수 상한(20개)을 법 대신 시행령에 맡기려 했지만, 소위에서 이 부분은 빠졌어요.','약국도 판매점도 없는 지역은 상비약 판매점의 24시간 운영 의무를 면제해요.'],
+   pro:['20개 상한은 2012년 도입 당시 근거가 불분명하다 (복지부, 국무조정실)','지금 편의점 상비약은 11개 품목, 상한 20개 중 9개가 비어 있다','약국도 판매점도 없는 읍면동 556곳 (전국 3,636곳 중, 한지아 의원안 근거)'],
+   con:['품목 수를 수시로 조정할 필요성이 높지 않다 (국회 전문위원 검토보고서)','청소년 과량 복용 우려, 복지부도 의약품별 차등 관리 필요 의견','대안: 공공심야약국 확충, 포장 단위 축소 (약사회 등)'],
+   video:'media/otc.mp4', poster:'media/otc.jpg',
+   sources:[['데일리팜','https://dailypharm.com/user/news/345045'],['데일리팜','https://dailypharm.com/user/news/344644'],['약사공론','https://www.kpanews.co.kr/news/articleView.html?idxno=549683'],['약사공론','https://www.kpanews.co.kr/news/articleView.html?idxno=549909'],['쿠키뉴스','https://www.kukinews.com/article/view/kuk202611250105']]}
 ];
 const NOTIS = [
   {id:'n4', bill:'tsg', date:'11.18', text:'건보공단 특사경법 — 법사위 전체회의에서 또 처리되지 않았어요.'},
   {id:'n3', bill:'tsg', date:'11.16', text:'건보공단 특사경법 — 법사위 전체회의 의결이 보류됐어요. 1분 쇼츠로 정리했어요.'},
-  {id:'n5', bill:'eldercare', date:'11.26', text:'고령자돌봄주택 특별법 — 상임위 심사가 멈춰 있어요.'},
+  {id:'n7', bill:'otc', date:'11.25', text:'편의점 상비약법 — 복지위 법안소위를 수정 통과했어요. 1분 쇼츠로 정리했어요.'},
+  {id:'n5', bill:'eldercare', date:'11.26', text:'고령자돌봄주택 특별법 — 상임위 심사가 멈춰 있어요. 1분 쇼츠로 정리했어요.'},
+  {id:'n6', bill:'pm', date:'11.11', text:'PM법 — 국토위 교통소위에서 다시 심사했어요. 1분 쇼츠로 정리했어요.'},
   {id:'n2', bill:'tsg', date:'11.11', text:'건보공단 특사경법 — 법사위 법안심사소위를 통과했어요.'}
 ];
 const ICON = {
@@ -220,7 +233,7 @@ function viewHome(){
     <section style="display:flex;flex-direction:column;gap:8px">
       <div class="row"><h2>관심 분야 쇼츠</h2><a href="#shorts" style="min-height:44px;display:flex;align-items:center;font-size:14px">전체 보기</a></div>
       <div class="thumbs">${BILLS.map(b => b.video
-        ? `<button class="thumb" data-go="shorts" style="background-image:url(${POSTER_TSG})"><span>${esc(b.short)}, 1분 정리</span></button>`
+        ? `<button class="thumb" data-go="shorts" data-reel="${b.id}" style="background-image:url(${b.poster})"><span>${esc(b.short)}, 1분 정리</span></button>`
         : `<button class="thumb soon" data-go="shorts"><span>${esc(b.short)}<br>쇼츠 준비 중</span></button>`).join('')}</div>
     </section>
     <p class="mut sm" style="margin:0">법안 정보는 2026년 11월 보도를 바탕으로 정리한 시연용 데이터예요.</p>
@@ -232,7 +245,7 @@ function viewBill(id){
   const tl = STAGES.map((s, i) => {
     const cls = i < b.cur ? 'd' : i === b.cur ? 'n' : 't';
     return `<div class="ts ${cls}"><div class="rail"><span class="k"></span>${i < 5 ? '<span class="ln"></span>' : ''}</div>
-      <div class="tx"><div><b>${s}</b>${b.subs[i] ? `<span class="mut sm">${esc(b.subs[i])}</span>` : ''}</div>${i === b.cur ? `<span class="tag">${b.hold ? '보류' : '진행 중'}</span>` : ''}</div></div>`;
+      <div class="tx"><div><b>${s}</b>${b.subs[i] ? `<span class="mut sm">${esc(b.subs[i])}</span>` : ''}</div>${i === b.cur ? `<span class="tag">${b.tag || (b.hold ? '보류' : '진행 중')}</span>` : ''}</div></div>`;
   }).join('');
   const f = following(b.id);
   return `<div class="top" style="padding:8px 8px 0"><a class="icon-btn plain" href="#home" aria-label="뒤로" style="color:var(--ink)">${ic('back')}</a>
@@ -244,7 +257,7 @@ function viewBill(id){
     ${b.pro.length ? `<div class="two"><div class="box side"><h3 class="pro">찬성 측</h3><ul>${b.pro.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div>
       <div class="box side"><h3 class="con">반대 측</h3><ul>${b.con.map(s => '<li>' + esc(s) + '</li>').join('')}</ul></div></div>` : ''}
     <section><h2 style="margin-bottom:10px">진행 단계</h2><div class="tl">${tl}</div></section>
-    ${b.video ? `<button class="watch" data-go="shorts"><span style="width:36px;height:36px;border-radius:10px;background:#2E3138;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+    ${b.video ? `<button class="watch" data-go="shorts" data-reel="${b.id}"><span style="width:36px;height:36px;border-radius:10px;background:#2E3138;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
       <span style="flex:1"><b style="display:block;font-size:14px">이 법안 1분 쇼츠로 보기</b><span style="font-size:12px;color:#B8BBC2">44초 · 자막</span></span>${ic('chev',18)}</button>` : ''}
     <p class="src">출처: ${b.sources.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>
   </div>
@@ -257,11 +270,11 @@ function viewShorts(){
   return '<div class="feed" id="feed">' + list.map(b => {
     const liked = S.liked.includes(b.id), saved = S.saved.includes(b.id);
     const media = b.video
-      ? `<video src="${VIDEO_TSG}" poster="${POSTER_TSG}" playsinline muted loop preload="metadata" aria-label="${esc(b.short)} 쇼츠"></video>
+      ? `<video src="${b.video}" poster="${b.poster}" playsinline muted loop preload="metadata" aria-label="${esc(b.short)} 쇼츠"></video>
          <button class="tap" data-act="playpause" aria-label="재생 또는 일시정지"></button>
          <button class="mute" data-act="mute">소리 켜기</button>`
       : `<div class="soonbox">${ic('shorts',44)}<strong>${esc(b.short)}</strong><span>쇼츠를 만들고 있어요. 다음 단계로 넘어가면 자동으로 올라와요.</span></div>`;
-    return `<section class="reel" aria-label="${esc(b.short)}">${media}
+    return `<section class="reel" id="reel-${b.id}" aria-label="${esc(b.short)}">${media}
       <div class="side-acts">
         <button data-act="like" data-id="${b.id}" aria-pressed="${liked}"><svg width="28" height="28" viewBox="0 0 24 24" fill="${liked ? '#F0536B' : 'none'}" stroke="${liked ? '#F0536B' : '#fff'}" stroke-width="1.8" aria-hidden="true">${ICON.heart}</svg>공감</button>
         <button data-act="save" data-id="${b.id}" aria-pressed="${saved}"><svg width="28" height="28" viewBox="0 0 24 24" fill="${saved ? '#fff' : 'none'}" stroke="#fff" stroke-width="1.8" aria-hidden="true">${ICON.save}</svg>${saved ? '저장됨' : '저장'}</button>
@@ -320,9 +333,12 @@ function route(){
   app.classList.toggle('dark', h === 'shorts');
   const t = (k, l, i) => `<a href="#${k}" ${tab === k ? 'aria-current="page"' : ''}>${ic(i)}${l}${k === 'alerts' && unread() ? `<span class="badge">${unread()}</span>` : ''}</a>`;
   tabs.innerHTML = t('home','홈','home') + t('shorts','쇼츠','shorts') + t('alerts','알림','bell') + t('interests','내 관심','user');
-  if (h === 'shorts') setupFeed();
+  if (h === 'shorts') {
+    setupFeed();
+    if (focusReel) { const r = document.getElementById('reel-' + focusReel); if (r) r.scrollIntoView({block:'start'}); focusReel = null; }
+  }
 }
-let keepScroll = false;
+let keepScroll = false, focusReel = null;
 function rerender(){ const y = view.scrollTop; route(); if (keepScroll) view.scrollTop = y; }
 
 /* ---- shorts autoplay ---- */
@@ -341,7 +357,7 @@ view.addEventListener('click', e => {
   const el = e.target.closest('button,[data-go]'); if (!el) return;
   const d = el.dataset;
   keepScroll = true;
-  if (d.go) { keepScroll = false; location.hash = d.go; return; }
+  if (d.go) { keepScroll = false; focusReel = d.reel || null; if (location.hash === '#' + d.go) route(); else location.hash = d.go; return; }
   if (d.filter) { S.filter = d.filter; }
   else if (d.cat) { S.interests = S.interests.includes(d.cat) ? S.interests.filter(c => c !== d.cat) : [...S.interests, d.cat]; }
   else if (d.stage) { S.stages[+d.stage] = !S.stages[+d.stage]; }
